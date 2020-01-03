@@ -1,0 +1,131 @@
+{% load i18n static %}
+<!doctype html>
+{% load bootstrap4 %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Portfolio Performance</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="/static/vendor/select2/dist/css/select2.css" type="text/css" media="screen" rel="stylesheet">
+        <link href="/static/admin/css/autocomplete.css" type="text/css" media="screen" rel="stylesheet">
+        <link href="/static/autocomplete_light/select2.css" type="text/css" media="screen" rel="stylesheet">
+
+        <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/css/portfolio.css" rel="stylesheet">
+        <link href="/static/admin/css/widgets.css" rel="stylesheet">
+
+        <!-- Custom styles for this template -->
+        <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
+
+
+        <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
+        <script type="text/javascript" src="/static/autocomplete_light/jquery.init.js"></script>
+        <script type="text/javascript" src="/static/vendor/select2/dist/js/select2.full.js"></script>
+        <script type="text/javascript" src="/static/vendor/select2/dist/js/i18n/en.js"></script>
+        <script type="text/javascript" src="/static/autocomplete_light/autocomplete.init.js"></script>
+        <script type="text/javascript" src="/static/autocomplete_light/forward.js"></script>
+        <script type="text/javascript" src="/static/autocomplete_light/select2.js"></script>
+        <script type="text/javascript" src="/static/autocomplete_light/jquery.post-setup.js"></script>
+
+        <script src="/static/js/popper.min.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        <script src="/static/js/jquery.mask.min.js"></script>
+        <script src="/static/js/portfolio.js"></script>
+
+        <script type="text/javascript" src="/static/js/jsi18n.js"></script>
+        <script type="text/javascript" src="/static/admin/js/core.js"></script>
+
+        <script type="text/javascript" src="/static/admin/js/calendar.js"></script>
+        <script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
+    </head>
+    {% load i18n %}
+
+    <body>
+
+        <div class="container">
+
+            <div class="jumbotron p-3 p-md-5 text-white rounded bg-dark">
+                <div class="col-md-12 px-0">
+                    <form action="" method="POST" novalidate>
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% bootstrap_field form.username %}
+                            </div>
+                            <div class="col-md-4">
+                                {% bootstrap_field form.start_date %}
+                            </div>
+                            <div class="col-md-4">
+                                {% bootstrap_field form.initial_balance %}
+                            </div>
+                            <div class="col-md-4">
+                                {% bootstrap_field form.residual %}
+                            </div>
+                        </div>
+
+                    <fieldset>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Portfolio</h4>
+                            </div>
+                            <div class="col-md-6" style="text-align:right">
+                                <a id="add_allocation" href="#" class="btn btn-sm btn-success">Add Allocation</a>
+                            </div>
+                        </div>
+                        <div id="formset">
+                            {{ formset.management_form }}
+                            {% for allocation_form in formset %}
+                                <div class="allocation_form{% if forloop.last %} empty-form{% endif %}">
+                                    <div class="row">
+                                        <div class="col-md-4 allocation">
+                                            {% bootstrap_field allocation_form.stock %}
+                                        </div>
+                                        <div class="col-md-2 desired_percentage">
+                                            {% bootstrap_field allocation_form.desired_percentage %}
+                                        </div>
+                                        <div class="col-md-2 quantity">
+                                            {% bootstrap_field allocation_form.quantity %}
+                                        </div>
+                                        <div class="col-md-2 unit_value">
+                                            {% bootstrap_field allocation_form.unit_value %}
+                                        </div>
+                                        <div class="col-md-2 percentage">
+                                            {% bootstrap_field allocation_form.percentage %}
+                                        </div>
+                                        <div class="col-md-12">
+                                            {% if allocation_form.original %}
+                                                {% bootstrap_field allocation_form.DELETE %}
+                                            {% else %}
+                                                <a class="inline-deletelink remove_allocation" href="#" id="portfolio-{{ forloop.counter0 }}-remove">Remove Stock</a>
+                                            {% endif %}
+                                        </div>
+
+                                    </div>
+                                    <hr>
+                                </div>
+                            {% endfor %}
+
+
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <main role="main" class="container">
+        {% bootstrap_messages %}
+        <div class="row mb-2">
+           {% block conteudo %}{% endblock %}
+        </div>
+    </main><!-- /.container -->
+
+    <footer class="blog-footer">
+      <p></p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+.empty-form {
+    display: none;
+}
+
+.date-icon{
+    display:inline-block;
+    width:16px;
+    height:16px;
+    background: url(/static/img/icon-calendar.png);
+    vertical-align:middle;
+}
+
+.select2-container{
+    min-width: 0px;
+}
+
+.select2-selection--single{
+    border: 0px !important;
+}
