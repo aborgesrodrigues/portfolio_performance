@@ -85,6 +85,9 @@
                                     <div class="allocation_form">
                                         <div class="row">
                                             <div class="col-md-4 allocation">
+                                                {% for campo in allocation_form.hidden_fields %}
+                                                {{ campo }}
+                                                {% endfor %}
                                                 {% bootstrap_field allocation_form.stock %}
                                             </div>
                                             <div class="col-md-2 unit_value">
@@ -102,7 +105,7 @@
                                             <div class="col-md-12">
                                                 {% if allocation_form.original %}
                                                     {% bootstrap_field allocation_form.DELETE %}
-                                                {% else %}
+                                                {% elif not forloop.first %}
                                                     <a class="inline-deletelink remove_allocation" href="#" id="portfolio-{{ forloop.counter0 }}-remove">Remove Stock</a>
                                                 {% endif %}
                                             </div>
@@ -128,5 +131,14 @@
         <footer class="blog-footer">
           <p></p>
         </footer>
+    <script>
+        {% if form.instance.start_date %}
+            console.log("{{ form.instance.start_date }}");
+            console.log({{ form.instance.start_date|date:"d/m/Y" }});
+            date = new Date("{{ form.instance.start_date }}");
+            console.log(date);
+            //$("#id_start_date").val({{ form.instance.start_date|date:"d/m/Y" }})
+        {% endif %}
+    </script>
   </body>
 </html>

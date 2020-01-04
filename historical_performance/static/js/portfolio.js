@@ -97,6 +97,7 @@
 
                 //hide part of the autocomplete component
                 $(this).siblings("[data-select2-id=1]").hide();
+                $(this).siblings("[data-select2-id=2]").hide();
                 var $container = $(this).siblings(".select2-container--default");
                 $container.addClass("form-control");
                 $container.css("width", "100%")
@@ -118,11 +119,9 @@
                     $initial_balance.focus();
                 }
                 else if(validate_total_percentage(e.target)){
-                    calculate_quantity_total(index);
+                    calculate_quantity_total(index, true);
 
                     calculate_residual();
-
-
                 }
             });
 
@@ -183,12 +182,12 @@
             //the element not visible is the template used to create the allocations form
             if($(this).is(":visible") && $(this).val()){
                 var index = $(this).attr("id").replace("id_allocations-", "").replace("-unit_value", "");
-                calculate_quantity_total(index);
+                calculate_quantity_total(index, false);
             }
         });
     }
 
-    function calculate_quantity_total(index){
+    function calculate_quantity_total(index, show_alert){
         var $percentage = $("#id_allocations-" + index + "-percentage");
         var $unit_value = $("#id_allocations-" + index + "-unit_value");
         var $balance = $("#id_initial_balance");
@@ -207,6 +206,12 @@
             console.log("quantity_floor " + quantity_floor)
             $("#id_allocations-" + index + "-quantity").val(quantity_floor);
             $("#id_allocations-" + index + "-total").val((quantity_floor * unit_value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
+        }
+        else{
+            if(show_alert){
+                alert("The initial balance and unit value should be informed.")
+            }
+            $percentage.val("");
         }
     }
 

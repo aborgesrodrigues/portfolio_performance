@@ -10,6 +10,7 @@ import requests
 import json
 
 
+
 class PortfolioForm(forms.ModelForm):
 	start_date = forms.DateField(label='Start Date', help_text='dd/mm/aaaa',
 	                                      widget=widgets.AdminDateWidget(
@@ -21,6 +22,13 @@ class PortfolioForm(forms.ModelForm):
 		attrs={"style": "width:100px", "placeholder": "", "disabled": ""}))
 	username = forms.CharField(label='Username', widget=forms.TextInput(
 		attrs={"onkeyup": "slugify(this)", "onblur": "slugify(this)"}))
+
+	def __init__(self, *args, **kwargs):
+		super(PortfolioForm, self).__init__(*args, **kwargs)
+
+		if self.instance.pk:
+			self.fields['username'].widget.attrs['disabled'] = True
+			self.fields["start_date"].initial = self.instance.start_date.strftime("%d/%m/%Y")
 
 	def clean_initial_balance(self):
 		self.cleaned_data["initial_balance"] = Decimal(self.cleaned_data["initial_balance"].replace(",",""))
@@ -57,6 +65,9 @@ class AllocationForm(forms.ModelForm):
 		self.fields['total'].widget.attrs['disabled'] = True
 		self.fields['unit_value'].widget.attrs['disabled'] = True
 
+		if self.instance.pk:
+			self.fields['stock'].choices = [(self.instance.stock, self.instance.stock)]
+
 
 	def clean(self):
 		stock = self.data["%s-stock" % (self.prefix)]
@@ -70,7 +81,8 @@ class AllocationForm(forms.ModelForm):
 		else:
 			self.fields['stock'].choices = [(stock, stock)]
 			self.cleaned_data["stock"] = stock
-			del self._errors["stock"]
+			if self._errors.get("stock", None):
+				del self._errors["stock"]
 
 		return self.cleaned_data
 
@@ -80,5 +92,5 @@ class AllocationForm(forms.ModelForm):
 
 
 AllocationFormSet = inlineformset_factory(
-    Portfolio, Allocation, extra=1, can_delete=True, form=AllocationForm
+    Portfolio, Allocation, extra= 0, min_num=1, can_delete=True, form=AllocationForm
 )
