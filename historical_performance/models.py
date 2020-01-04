@@ -23,20 +23,22 @@ class Portfolio(models.Model):
 		#normalize the username
 		self.username = unicodedata.normalize('NFKC', force_text(self.username))
 
+		super(Portfolio, self).save(*args, **kwargs)
+
 
 class Allocation(models.Model):
 	"""
 	Class to persist Portfolio
 	"""
 
-	portfolio = models.ForeignKey(Portfolio, verbose_name="Portfolio", related_name='portfolio', on_delete=models.PROTECT)
+	portfolio = models.ForeignKey(Portfolio, verbose_name="Portfolio", related_name='allocations', on_delete=models.PROTECT)
 	stock = models.CharField(max_length=20, verbose_name="Stock")
 	quantity = models.PositiveIntegerField(verbose_name="Quantity")
-	percentage = models.DecimalField(verbose_name="Real Percentage", max_digits=5, decimal_places=2)
+	percentage = models.PositiveIntegerField(verbose_name="Percentage")
 	unit_value = models.DecimalField(verbose_name="Value", max_digits=8, decimal_places=2)
 
 	def __str__(self):
-		return self.allocation
+		return self.stock
 
 class PerformancePortfolio(models.Model):
 	"""
@@ -44,7 +46,7 @@ class PerformancePortfolio(models.Model):
 	"""
 
 	date = models.DateField(verbose_name="Date")
-	portfolio = models.ForeignKey(Portfolio, verbose_name="Portfolio", related_name='performances', on_delete=models.PROTECT)
+	allocation = models.ForeignKey(Allocation, verbose_name="Portfolio", related_name='performances', on_delete=models.PROTECT)
 	unit_value = models.IntegerField(verbose_name="Value")
 
 	def __str__(self):

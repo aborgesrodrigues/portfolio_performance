@@ -29,61 +29,66 @@
 
 
             $("#add_allocation").on("click", function(e){
-                var $id_start_date = $("#id_start_date")
+                if(validate_start_date()){
 
-                //The start date is needed to search for the stock market quotation
-                if($id_start_date.val() == ""){
-                    alert("Please inform the start date.");
-                    $id_start_date.focus();
-                    return;
+                    //add a new allocation spot
+                    e.preventDefault();
+                    var $this = $(this);
+                    var formset = $("#formset");
+                    var form_template = formset.find(".allocation_form:first").clone();
+                    var html_template = form_template.html();
+                    var totalForms = $("#id_allocations-TOTAL_FORMS").attr("autocomplete", "off");
+                    var nextIndex = parseInt(totalForms.val());
+                    totalForms.val(nextIndex + 1);
+                    html_template = replaceAll(html_template, "-0-", "-"+nextIndex+"-");
+                    var new_form = $("<div class='allocation_form'>"+html_template+"</div>");
+                    new_form.find(":input").each(function(e){
+                        $(this).val("");
+                    });
+                    formset.append(new_form);
                 }
-
-                //add a new allocation spot
-                e.preventDefault();
-                var $this = $(this);
-                var formset = $("#formset");
-                var form_template = formset.find(".allocation_form:first").clone();
-                var html_template = form_template.html();
-                var totalForms = $("#id_portfolio-TOTAL_FORMS").attr("autocomplete", "off");
-                var nextIndex = parseInt(totalForms.val());
-                totalForms.val(nextIndex + 1);
-                html_template = replaceAll(html_template, "-0-", "-"+nextIndex+"-");
-                var new_form = $("<div class='allocation_form'>"+html_template+"</div>");
-                new_form.find(":input").each(function(e){
-                    $(this).val("");
-                });
-                formset.append(new_form);
             });
 
             $(document).on('click', ".remove_allocation", function(e){
                 $(this).parents(".allocation_form").remove();
-                console.log($(this).parents(".allocation_form").length);
+            });
+
+            $(document).on('change', "#id_start_date", function(e){
+                update_unit_values();
+            });
+
+            $(document).on('change', "#id_initial_balance", function(e){
+                //update the quantities of the stocks
+                load_quantity_total();
             });
 
             //Event fired when selected a stock in the autocomplete list
             $(document).on('change', '[data-autocomplete-light-function=select2]', function(e) {
-                //get the stock selected
-                var stock = $(e.target).find("option").val();
-                var index = $(e.target).attr("id").replace("id_portfolio-", "").replace("-stock", "");
+                var index = $(e.target).attr("id").replace("id_allocations-", "").replace("-stock", "");
+                update_unit_value(index);
+                /*if(validate_start_date()){
+                    //get the stock selected
+                    var stock = $(e.target).find("option").val();
+                    var index = $(e.target).attr("id").replace("id_allocations-", "").replace("-stock", "");
 
-                if(stock){
-                    //get the start date
-                    var start_date = $("#id_start_date").val();
-                    var formated_start_date = start_date.split("/")
-                    formated_start_date = formated_start_date[2] + "-" + formated_start_date[1] + "-" + formated_start_date[0]
-                    console.log("https://api.worldtradingdata.com/api/v1/history_multi_single_day?symbol=" + stock + "&date=" + formated_start_date + "&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG");
-
-                    //get the quotation of the stock on the start date
-                    callAjax("https://api.worldtradingdata.com/api/v1/history_multi_single_day?symbol=" + stock + "&date=" + formated_start_date + "&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG",
-                        function(result){
-                            if(result["date"]){
-                                $("#id_portfolio-" + index + "-unit_value").val(result.data[stock].close);
-                            }
-                            else{
-                                alert("There is no stock market quotation for the date '" + start_date + "'")
-                            }
-                        });
-                }
+                    if(stock){
+                        //get the start date
+                        var start_date = $("#id_start_date").val();
+                        var formated_start_date = start_date.split("/")
+                        formated_start_date = formated_start_date[2] + "-" + formated_start_date[1] + "-" + formated_start_date[0]
+                        //console.log("https://api.worldtradingdata.com/api/v1/history_multi_single_day?symbol=" + stock + "&date=" + formated_start_date + "&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG");
+                        //get the quotation of the stock on the start date
+                        callAjax("https://api.worldtradingdata.com/api/v1/history_multi_single_day?symbol=" + stock + "&date=" + formated_start_date + "&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG",
+                            function(result){
+                                if(result["date"]){
+                                    $("#id_allocations-" + index + "-unit_value").val(result.data[stock].close);
+                                }
+                                else{
+                                    alert("There is no stock market quotation for the date '" + start_date + "'")
+                                }
+                            });
+                    }
+                }*/
             });
 
             //Event fired on the initialization of the stock autocomplete
@@ -92,35 +97,176 @@
 
                 //hide part of the autocomplete component
                 $(this).siblings("[data-select2-id=1]").hide();
-                $(this).siblings("[data-select2-id=2]").addClass("form-control");
-                $(this).siblings("[data-select2-id=2]").css("width", "100%")
+                var $container = $(this).siblings(".select2-container--default");
+                $container.addClass("form-control");
+                $container.css("width", "100%")
             });
 
-            $(document).on('change', "[id$='desired_percentage']", function(e) {
+            $(document).on('change', "[id$='percentage']", function(e) {
                 var percentage = parseInt($(e.target).val());
-                var index = $(e.target).attr("id").replace("id_portfolio-", "").replace("-desired_percentage", "");
+                var index = $(e.target).attr("id").replace("id_allocations-", "").replace("-percentage", "");
+                var $initial_balance = $("#id_initial_balance")
 
                 if(percentage < 0 || percentage > 100){
                     alert("The percentage should be between 0 and 100.");
                     $(e.target).val("");
                     $(e.target).focus();
                 }
-                else{
-                    //calculate the quantity needed to fulfill the percentage informed
-                    var unit_value = parseFloat($("#id_portfolio-" + index + "-unit_value").val());
-                    var balance = parseFloat(replaceAll($("#id_initial_balance").val(), ",", ""));
-                    console.log(balance);
-                    var desired_value = balance * percentage / 100;
-                    var quantity = desired_value / unit_value;
-                    var quantity_floor = Math.floor(quantity);
+                else if(!$initial_balance.val()){
+                    alert("Please inform the initial balance.");
+                    $(e.target).val("");
+                    $initial_balance.focus();
+                }
+                else if(validate_total_percentage(e.target)){
+                    calculate_quantity_total(index);
 
-                    $("#id_portfolio-" + index + "-quantity").val(quantity_floor);
-                    $("#id_portfolio-" + index + "-percentage").val((quantity_floor * unit_value / balance * 100).toFixed(2));
+                    calculate_residual();
+
+
                 }
             });
 
-    });
+            $("#btn_save").click(
+                function(event){
+                    //Remove disable attribute to allow saving the data
+                    var $disableds = $(":disabled");
+                    $disableds.attr("disabled", false);
+                    $disableds.attr("readonly", true);
+                    return true;
+                });
 
-    function calculate_percentage(element){
+            load_quantity_total();
+            calculate_residual();
 
+            var $container = $(".select2-container--default");
+            $container.addClass("form-control");
+            $container.css("width", "100%")
+        });
+
+    function validate_total_percentage(element){
+        var total_percentage = 0.0;
+        $("[id$='percentage']").each(function(){
+            //the element not visible is the template used to create the allocations form
+            if($(this).is(":visible"))
+                total_percentage += parseFloat($(this).val());
+        });
+
+        if(total_percentage > 100){
+            alert("The sum of the percentages should not be more than 100.");
+            if(element){
+                $(element).val("");
+                $(element).focus();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    function calculate_residual(){
+        var $initial_balance = $("#id_initial_balance");
+        if($initial_balance.val()){
+            var initial_balance = parseFloat($initial_balance.val().replace(",", ""));
+
+            $("[id$='total']").each(function(){
+                //the element not visible is the template used to create the allocations form
+                if($(this).is(":visible") && $(this).val())
+                    initial_balance -= parseFloat($(this).val().replace(",", ""));
+            });
+
+            $("#id_residual").val(initial_balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'))
+        }
+    }
+
+    function load_quantity_total(){
+        //calculate the quantity and total to all stocks
+        $("[id$='unit_value']").each(function(){
+            //the element not visible is the template used to create the allocations form
+            if($(this).is(":visible") && $(this).val()){
+                var index = $(this).attr("id").replace("id_allocations-", "").replace("-unit_value", "");
+                calculate_quantity_total(index);
+            }
+        });
+    }
+
+    function calculate_quantity_total(index){
+        var $percentage = $("#id_allocations-" + index + "-percentage");
+        var $unit_value = $("#id_allocations-" + index + "-unit_value");
+        var $balance = $("#id_initial_balance");
+
+        if($balance.val() && $percentage.val() && $unit_value.val()){
+            var percentage = parseFloat($percentage.val());
+            var unit_value = parseFloat($unit_value.val());
+            var balance = parseFloat(replaceAll($balance.val(), ",", ""));
+
+            //Calculate the value to allocate in the selected stock
+            var desired_value = balance * percentage / 100;
+            //Calculate the quantity of stocks needed
+            var quantity = desired_value / unit_value;
+            var quantity_floor = Math.floor(quantity);
+
+            console.log("quantity_floor " + quantity_floor)
+            $("#id_allocations-" + index + "-quantity").val(quantity_floor);
+            $("#id_allocations-" + index + "-total").val((quantity_floor * unit_value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
+        }
+    }
+
+    function slugify(input)
+    {
+        input.value = input.value.toString().toLowerCase()
+            .replace(/\s+/g, '-')           // Replace spaces with -
+            .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+            .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+            .replace(/^-+/, '')             // Trim - from start of text
+            .replace(/-+$/, '');            // Trim - from end of text
+    }
+
+    function validate_start_date(){
+        //The start date is needed to search for the stock market quotation
+        var $id_start_date = $("#id_start_date")
+
+        //The start date is needed to search for the stock market quotation
+        if($id_start_date.val() == ""){
+            alert("Please inform the start date.");
+            $id_start_date.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    function update_unit_values(){
+        //Update unit value by the start date
+        $("[id$='unit_value']").each(function(){
+            //the element not visible is the template used to create the allocations form
+            if($(this).is(":visible")){
+                var index = $(this).attr("id").replace("id_allocations-", "").replace("-unit_value", "");
+                update_unit_value(index);
+            }
+        });
+    }
+
+    function update_unit_value(index){
+        if(validate_start_date()){
+            //get the stock selected
+            var $stock = $("#id_allocations-" + index + "-stock");
+            var stock = $stock.val();
+
+            if(stock){
+                //get the start date
+                var start_date = $("#id_start_date").val();
+                var formated_start_date = start_date.split("/")
+                formated_start_date = formated_start_date[2] + "-" + formated_start_date[1] + "-" + formated_start_date[0]
+                //console.log("https://api.worldtradingdata.com/api/v1/history_multi_single_day?symbol=" + stock + "&date=" + formated_start_date + "&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG");
+                //get the quotation of the stock on the start date
+                callAjax("https://api.worldtradingdata.com/api/v1/history_multi_single_day?symbol=" + stock + "&date=" + formated_start_date + "&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG",
+                    function(result){
+                        if(result["date"]){
+                            $("#id_allocations-" + index + "-unit_value").val(result.data[stock].close);
+                        }
+                        else{
+                            alert("There is no stock market quotation for the date '" + start_date + "'")
+                        }
+                    });
+            }
+        }
     }

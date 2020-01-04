@@ -1,9 +1,13 @@
+from decimal import Decimal
+
 from dal import autocomplete
 from django.forms import inlineformset_factory
 from django.contrib.admin import widgets
 from django import forms
 
 from historical_performance.models import Portfolio, Allocation
+import requests
+import json
 
 
 class PortfolioForm(forms.ModelForm):
@@ -14,7 +18,19 @@ class PortfolioForm(forms.ModelForm):
 	initial_balance = forms.CharField(label='Initial Balance', widget=forms.TextInput(
 		attrs={"style": "width:100px", "mask":"#,##0.00", "placeholder": ""}))
 	residual = forms.CharField(label='Residual', widget=forms.TextInput(
-		attrs={"style": "width:100px", "mask":"#,##0.00", "placeholder": "", "disabled": ""}))
+		attrs={"style": "width:100px", "placeholder": "", "disabled": ""}))
+	username = forms.CharField(label='Username', widget=forms.TextInput(
+		attrs={"onkeyup": "slugify(this)", "onblur": "slugify(this)"}))
+
+	def clean_initial_balance(self):
+		self.cleaned_data["initial_balance"] = Decimal(self.cleaned_data["initial_balance"].replace(",",""))
+
+		return self.cleaned_data["initial_balance"]
+
+	def clean_residual(self):
+		self.cleaned_data["residual"] = Decimal(self.cleaned_data["residual"].replace(",",""))
+
+		return self.cleaned_data["residual"]
 
 	class Meta:
 		model = Portfolio
@@ -23,15 +39,40 @@ class PortfolioForm(forms.ModelForm):
 
 
 class AllocationForm(forms.ModelForm):
-	unit_value = forms.DecimalField(label="Unit Value", widget=forms.TextInput(attrs={"style": "width:100px", "mask":"'#,##0.00'", "placeholder": ""}))
-	stock = forms.CharField(
+	unit_value = forms.DecimalField(label="Unit Value", widget=forms.TextInput(attrs={"style": "width:100px", "mask":"#,##0.00", "placeholder": ""}))
+	stock = autocomplete.Select2ListChoiceField(
 		widget=autocomplete.ListSelect2(url='stock-autocomplete', attrs={'data-minimum-input-length': 3, 'class': 'form-control', "style": "width: 100px"}))
-	desired_percentage = forms.DecimalField(label="Desired Percentage", widget=forms.TextInput(
-		attrs={"style": "width:100px", "mask": "'#,##0.00'", "placeholder": ""}))
-	percentage = forms.DecimalField(label="Real Percentage", widget=forms.TextInput(
-		attrs={"style": "width:100px", "mask": "'#,##0.00'", "placeholder": ""}))
-	quantity = forms.IntegerField(label="Quantity", widget=forms.TextInput(
-		attrs={"style": "width:100px", "mask": "'#,##0.00'", "placeholder": ""}))
+	total = forms.CharField(required=False, label="Total", widget=forms.TextInput(
+		attrs={"style": "width:100px", "mask": "#,##0.00", "placeholder": ""}))
+	percentage = forms.IntegerField(label="Percentage", widget=forms.TextInput(
+		attrs={"style": "width:100px", "mask": "999", "placeholder": ""}))
+	quantity = forms.IntegerField(required=False, label="Quantity", widget=forms.TextInput(
+		attrs={"style": "width:100px", "mask": "#,##0.00", "placeholder": ""}))
+
+
+	def __init__(self, *args, **kwargs):
+		super(AllocationForm, self).__init__(*args, **kwargs)
+		#The quantity, unit_value and total are automatically filled
+		self.fields['quantity'].widget.attrs['disabled'] = True
+		self.fields['total'].widget.attrs['disabled'] = True
+		self.fields['unit_value'].widget.attrs['disabled'] = True
+
+
+	def clean(self):
+		stock = self.data["%s-stock" % (self.prefix)]
+
+		#Validate if the stock informed exist
+		response = requests.get("https://api.worldtradingdata.com/api/v1/stock_search?search_term=%s&search_by=symbol&limit=50&page=1&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG" % stock)
+		json_response = json.loads(response.text)
+
+		if json_response.get("total_returned") == 0:
+			raise forms.ValidationError("Stock symbol is not valid!")
+		else:
+			self.fields['stock'].choices = [(stock, stock)]
+			self.cleaned_data["stock"] = stock
+			del self._errors["stock"]
+
+		return self.cleaned_data
 
 	class Meta:
 		model = Allocation
@@ -39,5 +80,5 @@ class AllocationForm(forms.ModelForm):
 
 
 AllocationFormSet = inlineformset_factory(
-    Portfolio, Allocation, extra=0, can_delete=True, form=AllocationForm, min_num=1
+    Portfolio, Allocation, extra=1, can_delete=True, form=AllocationForm
 )

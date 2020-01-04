@@ -48,11 +48,14 @@
     <body>
 
         <div class="container">
+            {% bootstrap_messages %}
 
             <div class="jumbotron p-3 p-md-5 text-white rounded bg-dark">
                 <div class="col-md-12 px-0">
                     <form action="" method="POST" novalidate>
+                        {% csrf_token %}
                         <div class="row">
+                            {{ form.errors }}
                             <div class="col-md-12">
                                 {% bootstrap_field form.username %}
                             </div>
@@ -67,65 +70,63 @@
                             </div>
                         </div>
 
-                    <fieldset>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h4>Portfolio</h4>
-                            </div>
-                            <div class="col-md-6" style="text-align:right">
-                                <a id="add_allocation" href="#" class="btn btn-sm btn-success">Add Allocation</a>
-                            </div>
-                        </div>
-                        <div id="formset">
-                            {{ formset.management_form }}
-                            {% for allocation_form in formset %}
-                                <div class="allocation_form{% if forloop.last %} empty-form{% endif %}">
-                                    <div class="row">
-                                        <div class="col-md-4 allocation">
-                                            {% bootstrap_field allocation_form.stock %}
-                                        </div>
-                                        <div class="col-md-2 desired_percentage">
-                                            {% bootstrap_field allocation_form.desired_percentage %}
-                                        </div>
-                                        <div class="col-md-2 quantity">
-                                            {% bootstrap_field allocation_form.quantity %}
-                                        </div>
-                                        <div class="col-md-2 unit_value">
-                                            {% bootstrap_field allocation_form.unit_value %}
-                                        </div>
-                                        <div class="col-md-2 percentage">
-                                            {% bootstrap_field allocation_form.percentage %}
-                                        </div>
-                                        <div class="col-md-12">
-                                            {% if allocation_form.original %}
-                                                {% bootstrap_field allocation_form.DELETE %}
-                                            {% else %}
-                                                <a class="inline-deletelink remove_allocation" href="#" id="portfolio-{{ forloop.counter0 }}-remove">Remove Stock</a>
-                                            {% endif %}
-                                        </div>
-
-                                    </div>
-                                    <hr>
+                        <fieldset>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4>Portfolio</h4>
                                 </div>
-                            {% endfor %}
+                                <div class="col-md-6" style="text-align:right">
+                                    <a id="add_allocation" href="#" class="btn btn-sm btn-success">Add Allocation</a>
+                                </div>
+                            </div>
+                            <div id="formset">
+                                {{ formset.management_form }}
+                                {% for allocation_form in formset %}
+                                    <div class="allocation_form">
+                                        <div class="row">
+                                            <div class="col-md-4 allocation">
+                                                {% bootstrap_field allocation_form.stock %}
+                                            </div>
+                                            <div class="col-md-2 unit_value">
+                                                {% bootstrap_field allocation_form.unit_value %}
+                                            </div>
+                                            <div class="col-md-2 percentage">
+                                                {% bootstrap_field allocation_form.percentage %}
+                                            </div>
+                                            <div class="col-md-2 quantity">
+                                                {% bootstrap_field allocation_form.quantity %}
+                                            </div>
+                                            <div class="col-md-2 total">
+                                                {% bootstrap_field allocation_form.total %}
+                                            </div>
+                                            <div class="col-md-12">
+                                                {% if allocation_form.original %}
+                                                    {% bootstrap_field allocation_form.DELETE %}
+                                                {% else %}
+                                                    <a class="inline-deletelink remove_allocation" href="#" id="portfolio-{{ forloop.counter0 }}-remove">Remove Stock</a>
+                                                {% endif %}
+                                            </div>
 
-
-                        </div>
-                    </fieldset>
-                </form>
+                                        </div>
+                                        <hr>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+                        <button class="btn btn-primary" id="btn_save">Save</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <main role="main" class="container">
-        {% bootstrap_messages %}
-        <div class="row mb-2">
-           {% block conteudo %}{% endblock %}
-        </div>
-    </main><!-- /.container -->
+        <main role="main" class="container">
+            <div class="row mb-2">
+               {% block conteudo %}{% endblock %}
+            </div>
+        </main><!-- /.container -->
 
-    <footer class="blog-footer">
-      <p></p>
-    </footer>
+        <footer class="blog-footer">
+          <p></p>
+        </footer>
   </body>
 </html>

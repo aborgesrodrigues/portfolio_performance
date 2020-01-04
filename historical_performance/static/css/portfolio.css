@@ -16,4 +16,14 @@
 
 .select2-selection--single{
     border: 0px !important;
+    padding: 0px;
+}
+
+.remove_allocation{
+    display:inline;
+    vertical-align:middle
+}
+
+input[readonly]{
+    cursor:default;
 }

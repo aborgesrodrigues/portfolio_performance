@@ -8,11 +8,13 @@ from dal import autocomplete
 import requests
 import json
 
+api = "https://api.worldtradingdata.com/api/v1/stock_search?api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG"
+
 class StockAutocomplete(autocomplete.Select2ListView):
 
 	def results(self, results):
 		#Customizing the autuocomplete results
-		response = requests.get("https://api.worldtradingdata.com/api/v1/stock_search?search_term=%s&search_by=symbol&limit=50&page=1&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG" % self.q)
+		response = requests.get(api + "&search_term=%s&search_by=symbol&limit=50&page=1" % self.q)
 		if response.ok:
 		    json_response = json.loads(response.text)
 
@@ -29,10 +31,21 @@ def portfolio_view(request, username= None):
 	form = PortfolioForm(request.POST or None, instance=initial_portfolio)
 	formset = AllocationFormSet(request.POST or None, instance=initial_portfolio)
 
-	if form.is_valid() and formset.is_valid():
-		form.save()
-		formset.save()
-		messages.success(request, 'Successfully added Performance Portfolio.')
+	if form.is_valid():
+		#Save portifolio data
+		portifolio = form.save()
+
+		#Save allocations data
+		formset = AllocationFormSet(request.POST or None, instance=portifolio)
+		if formset.is_valid():
+			formset.save()
+
+		#Save daily performance data
+		#for allocation in portifolio.allocations.all()
+
+
+		messages.success(request, 'Performance portfolio successfully added .')
+
 
 	context = {}
 	context['form'] = form
