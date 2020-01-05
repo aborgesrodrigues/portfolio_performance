@@ -229,7 +229,7 @@
                 update_unit_value(index);
             }
         });
-        console.log("calculate_residual")
+
         calculate_residual();
     }
 
@@ -244,9 +244,10 @@
                 var start_date = $("#id_start_date").val();
                 var formated_start_date = start_date.split("/")
                 formated_start_date = formated_start_date[2] + "-" + formated_start_date[1] + "-" + formated_start_date[0]
-                //console.log("https://api.worldtradingdata.com/api/v1/history_multi_single_day?symbol=" + stock + "&date=" + formated_start_date + "&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG");
+
                 //get the quotation of the stock on the start date
-                callAjax("https://api.worldtradingdata.com/api/v1/history_multi_single_day?symbol=" + stock + "&date=" + formated_start_date + "&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG",
+
+                callAjax("/" + stock + "/date=" + formated_start_date,
                     function(result){
                         if(result["date"]){
                             $("#id_allocations-" + index + "-unit_value").val(result.data[stock].close);

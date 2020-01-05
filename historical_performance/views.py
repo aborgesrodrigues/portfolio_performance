@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal
 
 from django.db.models import Max, Case, When, DateField
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
@@ -27,15 +28,13 @@ class StockAutocomplete(autocomplete.Select2ListView):
 		else:
 			return []
 
-#	def results(self, results):
-#		#Customizing the autuocomplete results
-#		response = requests.get(api + "&search_term=%s&search_by=symbol&limit=50&page=1" % self.q)
-#		if response.ok:
-#		    json_response = json.loads(response.text)
-#
-#		    return [dict(id=stock.get("symbol"), text="%s - %s" % (stock.get("symbol", ""), stock.get("name", ""))) for stock in json_response.get("data")]
-#		else:
-#			return []
+
+def get_quotation(request, stock, date):
+	response = requests.get(get_api_url("history_multi_single_day") + "symbol=%s&date=%s" % (stock, date))
+	if response.ok:
+		return JsonResponse(response.text)
+
+	return JsonResponse({})
 
 def portfolio_view(request, username= None):
 	# If the username is passed get the data from de database
