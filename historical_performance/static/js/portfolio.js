@@ -74,8 +74,8 @@
                 window.__dal__tSelect2Initialized = true;
 
                 //hide part of the autocomplete component
-                $(this).siblings("[data-select2-id=1]").hide();
-                $(this).siblings("[data-select2-id=2]").hide();
+                //$(this).siblings("[data-select2-id=1]").hide();
+                $(this).siblings(".select2-container--default:last").hide();
                 var $container = $(this).siblings(".select2-container--default");
                 $container.addClass("form-control");
                 $container.css("width", "100%")
