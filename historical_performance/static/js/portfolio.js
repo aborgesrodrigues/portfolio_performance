@@ -229,7 +229,7 @@
                 update_unit_value(index);
             }
         });
-
+        console.log("calculate_residual")
         calculate_residual();
     }
 
@@ -250,6 +250,7 @@
                     function(result){
                         if(result["date"]){
                             $("#id_allocations-" + index + "-unit_value").val(result.data[stock].close);
+                            calculate_quantity_total(index, false);
                         }
                         else{
                             alert("There is no stock market quotation for the date '" + start_date + "'")
