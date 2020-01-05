@@ -60,7 +60,6 @@
                     <form action="" method="POST" novalidate>
                         {% csrf_token %}
                         <div class="row">
-                            {{ form.errors }}
                             <div class="col-md-12">
                                 {% bootstrap_field form.username %}
                             </div>
