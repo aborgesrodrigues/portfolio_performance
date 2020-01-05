@@ -42,6 +42,11 @@
 
         <script type="text/javascript" src="/static/admin/js/calendar.js"></script>
         <script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+        <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+        <script src="/static/js/chart.js"></script>
     </head>
     {% load i18n %}
 
@@ -124,7 +129,17 @@
 
         <main role="main" class="container">
             <div class="row mb-2">
-               {% block conteudo %}{% endblock %}
+                <fieldset>
+                   <legend>Portfolio Performance</legend>
+                   <canvas id="portfolio_performance_chart"></canvas>
+                   <br/>
+
+                </fieldset>
+                <fieldset>
+                   <legend>Stock Price History</legend>
+                   <canvas id="stock_price_history_chart"></canvas>
+
+                </fieldset>
             </div>
         </main><!-- /.container -->
 
@@ -132,12 +147,11 @@
           <p></p>
         </footer>
     <script>
-        {% if form.instance.start_date %}
-            console.log("{{ form.instance.start_date }}");
-            console.log({{ form.instance.start_date|date:"d/m/Y" }});
-            date = new Date("{{ form.instance.start_date }}");
-            console.log(date);
-            //$("#id_start_date").val({{ form.instance.start_date|date:"d/m/Y" }})
+        {% if stock_price_history_day_data %}
+            var stock_price_history_day_data = JSON.parse("{{ stock_price_history_day_data | escapejs }}");
+        {% endif %}
+        {% if portfolio_performance_data %}
+            var portfolio_performance_data = JSON.parse("{{ portfolio_performance_data | escapejs }}");
         {% endif %}
     </script>
   </body>

@@ -66,29 +66,7 @@
             $(document).on('change', '[data-autocomplete-light-function=select2]', function(e) {
                 var index = $(e.target).attr("id").replace("id_allocations-", "").replace("-stock", "");
                 update_unit_value(index);
-                /*if(validate_start_date()){
-                    //get the stock selected
-                    var stock = $(e.target).find("option").val();
-                    var index = $(e.target).attr("id").replace("id_allocations-", "").replace("-stock", "");
 
-                    if(stock){
-                        //get the start date
-                        var start_date = $("#id_start_date").val();
-                        var formated_start_date = start_date.split("/")
-                        formated_start_date = formated_start_date[2] + "-" + formated_start_date[1] + "-" + formated_start_date[0]
-                        //console.log("https://api.worldtradingdata.com/api/v1/history_multi_single_day?symbol=" + stock + "&date=" + formated_start_date + "&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG");
-                        //get the quotation of the stock on the start date
-                        callAjax("https://api.worldtradingdata.com/api/v1/history_multi_single_day?symbol=" + stock + "&date=" + formated_start_date + "&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG",
-                            function(result){
-                                if(result["date"]){
-                                    $("#id_allocations-" + index + "-unit_value").val(result.data[stock].close);
-                                }
-                                else{
-                                    alert("There is no stock market quotation for the date '" + start_date + "'")
-                                }
-                            });
-                    }
-                }*/
             });
 
             //Event fired on the initialization of the stock autocomplete
@@ -103,6 +81,7 @@
                 $container.css("width", "100%")
             });
 
+            //Event fired when the percentage of an allocation is changed
             $(document).on('change', "[id$='percentage']", function(e) {
                 var percentage = parseInt($(e.target).val());
                 var index = $(e.target).attr("id").replace("id_allocations-", "").replace("-percentage", "");
@@ -142,6 +121,7 @@
             $container.css("width", "100%")
         });
 
+    //validate if the sum of the percentages is less or equal 100
     function validate_total_percentage(element){
         var total_percentage = 0.0;
         $("[id$='percentage']").each(function(){
@@ -161,6 +141,7 @@
         return true;
     }
 
+    //Calculate the residual value
     function calculate_residual(){
         var $initial_balance = $("#id_initial_balance");
         if($initial_balance.val()){
@@ -187,6 +168,7 @@
         });
     }
 
+    //Calculate the quantity and total to a specific stock
     function calculate_quantity_total(index, show_alert){
         var $percentage = $("#id_allocations-" + index + "-percentage");
         var $unit_value = $("#id_allocations-" + index + "-unit_value");
@@ -203,7 +185,6 @@
             var quantity = desired_value / unit_value;
             var quantity_floor = Math.floor(quantity);
 
-            console.log("quantity_floor " + quantity_floor)
             $("#id_allocations-" + index + "-quantity").val(quantity_floor);
             $("#id_allocations-" + index + "-total").val((quantity_floor * unit_value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
         }
@@ -248,6 +229,8 @@
                 update_unit_value(index);
             }
         });
+
+        calculate_residual();
     }
 
     function update_unit_value(index){

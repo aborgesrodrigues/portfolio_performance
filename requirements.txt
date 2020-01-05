@@ -2,5 +2,7 @@ Django==3.0.2
 django-bootstrap4==1.1.1
 django-autocomplete-light==3.5.0
 requests==2.22.0
-#gunicorn
-#django-heroku
+
+#the above are needed only for the heroku
+gunicorn
+django-heroku
