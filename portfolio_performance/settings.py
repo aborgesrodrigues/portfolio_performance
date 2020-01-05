@@ -133,7 +133,7 @@ TIME_INPUT_FORMATS = ["%H:%M:%S"]
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+#STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
