@@ -55,7 +55,7 @@ def portfolio_view(request, username= None):
 			formset.save()
 
 			#Save daily historical performance data
-			for allocation in initial_portfolio.allocations.all().order_by("date"):
+			for allocation in initial_portfolio.allocations.all():
 				#remove old allocations
 				PerformancePortfolio.objects.filter(allocation=allocation).delete()
 
@@ -87,7 +87,7 @@ def portfolio_view(request, username= None):
 
 	if initial_portfolio:
 
-		for allocation in initial_portfolio.allocations.all():
+		for allocation in initial_portfolio.allocations.all().order_by("date"):
 			#stock_price_history_day_data[allocation.stock] = [dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value)) for performance in allocation.performances.all()]
 
 			month_data[allocation.stock] = {}
