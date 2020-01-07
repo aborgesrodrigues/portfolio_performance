@@ -46,8 +46,8 @@ class PerformancePortfolio(models.Model):
 	"""
 
 	date = models.DateField(verbose_name="Date")
-	allocation = models.ForeignKey(Allocation, verbose_name="Portfolio", related_name='performances', on_delete=models.PROTECT)
+	allocation = models.ForeignKey(Allocation, verbose_name="Portfolio", related_name='performances', on_delete=models.CASCADE)
 	unit_value = models.DecimalField(verbose_name="Value", max_digits=8, decimal_places=2)
 
 	def __str__(self):
-		return '{} - Date: {}'.format(self.portfolio.allocation, self.date.strftime("%d/%m/%Y"))
+		return '{} - Date: {}'.format(self.allocation.stock, self.date.strftime("%d/%m/%Y"))
