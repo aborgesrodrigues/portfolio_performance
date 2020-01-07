@@ -55,7 +55,7 @@ def portfolio_view(request, username= None):
 			formset.save()
 
 			#Save daily historical performance data
-			for allocation in initial_portfolio.allocations.all():
+			for allocation in initial_portfolio.allocations.all().order_by("date"):
 				#remove old allocations
 				PerformancePortfolio.objects.filter(allocation=allocation).delete()
 
