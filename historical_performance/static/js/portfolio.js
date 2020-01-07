@@ -40,7 +40,7 @@
                     var totalForms = $("#id_allocations-TOTAL_FORMS").attr("autocomplete", "off");
                     var nextIndex = parseInt(totalForms.val());
                     totalForms.val(nextIndex + 1);
-                    html_template = replaceAll(html_template, "-0-", "-"+nextIndex+"-");
+                    html_template = replaceAll(html_template, "-__prefix__-", "-"+nextIndex+"-");
                     var new_form = $("<div class='allocation_form'>"+html_template+"</div>");
                     new_form.find(":input").each(function(e){
                         $(this).val("");
@@ -73,9 +73,6 @@
             $(document).on('autocompleteLightInitialize', '[data-autocomplete-light-function=select2]', function() {
                 window.__dal__tSelect2Initialized = true;
 
-                //hide part of the autocomplete component
-                //$(this).siblings("[data-select2-id=1]").hide();
-                $(this).siblings(".select2-container--default:last").hide();
                 var $container = $(this).siblings(".select2-container--default");
                 $container.addClass("form-control");
                 $container.css("width", "100%")
@@ -247,7 +244,7 @@
 
                 //get the quotation of the stock on the start date
 
-                callAjax("/" + stock + "/date=" + formated_start_date,
+                callAjax("/" + stock + "/" + formated_start_date,
                     function(result){
                         if(result["date"]){
                             $("#id_allocations-" + index + "-unit_value").val(result.data[stock].close);

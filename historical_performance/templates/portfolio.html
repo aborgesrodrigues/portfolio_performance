@@ -85,6 +85,31 @@
                             </div>
                             <div id="formset">
                                 {{ formset.management_form }}
+                                <div class="allocation_form empty-form">
+                                    <div class="row">
+                                        <div class="col-md-4 allocation">
+                                            {% for campo in formset.empty_form.hidden_fields %}
+                                                {{ campo }}
+                                            {% endfor %}
+                                            {% bootstrap_field formset.empty_form.stock %}
+                                        </div>
+                                        <div class="col-md-2 unit_value">
+                                            {% bootstrap_field formset.empty_form.unit_value %}
+                                        </div>
+                                        <div class="col-md-2 percentage">
+                                            {% bootstrap_field formset.empty_form.percentage %}
+                                        </div>
+                                        <div class="col-md-2 quantity">
+                                            {% bootstrap_field formset.empty_form.quantity %}
+                                        </div>
+                                        <div class="col-md-2 total">
+                                            {% bootstrap_field formset.empty_form.total %}
+                                        </div>
+                                        <div class="col-md-12">
+                                            <a class="inline-deletelink remove_allocation" href="#" id="portfolio-__prefix__-remove">Remove Stock</a>
+                                        </div>
+                                    </div>
+                                </div>
                                 {% for allocation_form in formset %}
                                     <div class="allocation_form">
                                         <div class="row">
@@ -107,10 +132,8 @@
                                                 {% bootstrap_field allocation_form.total %}
                                             </div>
                                             <div class="col-md-12">
-                                                {% if allocation_form.original %}
+                                                {% if not forloop.first %}
                                                     {% bootstrap_field allocation_form.DELETE %}
-                                                {% elif not forloop.first %}
-                                                    <a class="inline-deletelink remove_allocation" href="#" id="portfolio-{{ forloop.counter0 }}-remove">Remove Stock</a>
                                                 {% endif %}
                                             </div>
 

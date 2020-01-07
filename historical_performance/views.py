@@ -30,9 +30,9 @@ class StockAutocomplete(autocomplete.Select2ListView):
 
 
 def get_quotation(request, stock, date):
-	response = requests.get(get_api_url("history_multi_single_day") + "symbol=%s&date=%s" % (stock, date))
+	response = requests.get(get_api_url("history_multi_single_day") + "&symbol=%s&date=%s" % (stock, date))
 	if response.ok:
-		return JsonResponse(response.text)
+		return JsonResponse(json.loads(response.text))
 
 	return JsonResponse({})
 
