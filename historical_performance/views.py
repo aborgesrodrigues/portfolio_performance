@@ -87,14 +87,14 @@ def portfolio_view(request, username= None):
 
 	if initial_portfolio:
 
-		for allocation in initial_portfolio.allocations.all().order_by("date"):
+		for allocation in initial_portfolio.allocations.all():
 			#stock_price_history_day_data[allocation.stock] = [dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value)) for performance in allocation.performances.all()]
 
 			month_data[allocation.stock] = {}
 			year_data[allocation.stock] = {}
 			stock_price_history_day_data[allocation.stock] = []
 			portfolio_performance_data[allocation.stock] = []
-			for performance in allocation.performances.all():
+			for performance in allocation.performances.all().order_by("date"):
 				stock_price_history_day_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value)))
 
 				#get the performance date from the last day of each month
