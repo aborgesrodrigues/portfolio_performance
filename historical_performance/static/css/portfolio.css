@@ -26,3 +26,8 @@
 input[readonly]{
     cursor:default;
 }
+
+.stock_history{
+    width: 100px;
+    display: inline;
+}

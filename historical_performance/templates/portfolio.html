@@ -158,9 +158,17 @@
 
                 </fieldset>
                 <fieldset>
-                   <legend>Stock Price History</legend>
-                   <canvas id="stock_price_history_chart"></canvas>
+                    <legend>Stock Price History</legend>
+                    <canvas id="stock_price_history_chart"></canvas>
+                    <br/>
 
+                    Chart Type:
+                    <select id="unit_stock_history" class="form-control stock_history">
+                        <option value="day" selected>Day</option>
+                        <option value="month">Month</option>
+                        <option value="year">Year</option>
+                    </select>
+                    <button id="update_stock_history" class="btn btn-sm btn-success">update</button>
                 </fieldset>
             </div>
         </main><!-- /.container -->
@@ -171,9 +179,13 @@
     <script>
         {% if stock_price_history_day_data %}
             var stock_price_history_day_data = JSON.parse("{{ stock_price_history_day_data | escapejs }}");
+            var stock_price_history_month_data = JSON.parse("{{ stock_price_history_month_data | escapejs }}");
+            var stock_price_history_year_data = JSON.parse("{{ stock_price_history_year_data | escapejs }}");
+            var years = JSON.parse("{{ years | escapejs }}");
         {% endif %}
         {% if portfolio_performance_data %}
             var portfolio_performance_data = JSON.parse("{{ portfolio_performance_data | escapejs }}");
+            var portfolio_performance_years_data = JSON.parse("{{ portfolio_performance_years_data | escapejs }}");
         {% endif %}
     </script>
   </body>

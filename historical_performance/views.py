@@ -1,6 +1,7 @@
 import datetime
 from decimal import Decimal
 
+from django.db import transaction
 from django.db.models import Max, Case, When, DateField
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -54,26 +55,28 @@ def portfolio_view(request, username= None):
 		if formset.is_valid():
 			formset.save()
 
-			#Save daily historical performance data
-			for allocation in initial_portfolio.allocations.all():
-				#remove old allocations
-				PerformancePortfolio.objects.filter(allocation=allocation).delete()
+			with transaction.atomic():
+				#Save daily historical performance data
+				for allocation in initial_portfolio.allocations.all():
+					#remove old allocations
+					PerformancePortfolio.objects.filter(allocation=allocation).delete()
 
-				#Get historical for the stock
-				#https: // api.worldtradingdata.com / api / v1 / history?symbol = SNAP & sort = newest & api_token = avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG
-				response = requests.get(get_api_url("history") + "&symbol=%s&date_from=%s&sort=oldest" % (allocation.stock, allocation.portfolio.start_date.strftime("%Y-%m-%d")))
+					#Get historical for the stock
+					#https: // api.worldtradingdata.com / api / v1 / history?symbol = SNAP & sort = newest & api_token = avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG
+					response = requests.get(get_api_url("history") + "&symbol=%s&date_from=%s&sort=oldest" % (allocation.stock, allocation.portfolio.start_date.strftime("%Y-%m-%d")))
 
-				if response.ok:
-					json_response = json.loads(response.text)
+					if response.ok:
+						json_response = json.loads(response.text)
 
-					if json_response.get("name",None):
-						history = json_response.get("history", [])
-						for key in history:
-							performancePortfolio = PerformancePortfolio()
-							performancePortfolio.allocation = allocation
-							performancePortfolio.unit_value = Decimal(history[key].get("close", None))
-							performancePortfolio.date = datetime.datetime.strptime(key, "%Y-%m-%d")
-							performancePortfolio.save()
+						if json_response.get("name",None):
+							history = json_response.get("history", [])
+							for key in history:
+								performance_portfolio = PerformancePortfolio()
+								performance_portfolio.allocation = allocation
+								performance_portfolio.unit_value = Decimal(history[key].get("close", None))
+								performance_portfolio.date = datetime.datetime.strptime(key, "%Y-%m-%d")
+
+								performance_portfolio.save()
 
 
 			messages.success(request, 'Performance portfolio successfully added .')
@@ -81,9 +84,13 @@ def portfolio_view(request, username= None):
 
 	#generate the data for the stock price history chart
 	stock_price_history_day_data = {}
+	stock_price_history_month_data = {}
+	stock_price_history_year_data = {}
 	portfolio_performance_data = {}
+	portfolio_performance_years_data = {}
 	month_data = {}
 	year_data = {}
+	years = []
 
 	if initial_portfolio:
 
@@ -93,24 +100,43 @@ def portfolio_view(request, username= None):
 			month_data[allocation.stock] = {}
 			year_data[allocation.stock] = {}
 			stock_price_history_day_data[allocation.stock] = []
+			stock_price_history_month_data[allocation.stock] = []
+			stock_price_history_year_data[allocation.stock] = []
 			portfolio_performance_data[allocation.stock] = []
+			portfolio_performance_years_data[allocation.stock] = []
 			for performance in allocation.performances.all().order_by("date"):
 				stock_price_history_day_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value)))
 
 				#get the performance date from the last day of each month
-				month_data[allocation.stock][performance.date.strftime("%B/%Y")] = performance
+				month_data[allocation.stock][performance.date.strftime("%Y-%m")] = performance
 				# get the performance date from the last day of each year
 				year_data[allocation.stock][performance.date.strftime("%Y")] = performance
 
+		#create data for monthly performance
 		for stock in month_data:
 			for month in month_data[stock]:
 				performance = month_data[stock][month]
 				portfolio_performance_data[stock].append(dict(x=month, y=str(performance.unit_value * performance.allocation.quantity)))
+				stock_price_history_month_data[stock].append(dict(x=month, y=str(performance.unit_value)))
+
+		#create data for year performance
+		for stock in year_data:
+			for year in year_data[stock]:
+				if not year in years:
+					years.append((year))
+				performance = year_data[stock][year]
+				portfolio_performance_years_data[stock].append(dict(x=year, y=str(performance.unit_value * performance.allocation.quantity)))
+				stock_price_history_year_data[stock].append(dict(x=year, y=str(performance.unit_value)))
+
 
 	context = {}
 	context['form'] = form
 	context['formset'] = formset
 	context['stock_price_history_day_data'] = json.dumps(stock_price_history_day_data)
+	context['stock_price_history_month_data'] = json.dumps(stock_price_history_month_data)
+	context['stock_price_history_year_data'] = json.dumps(stock_price_history_year_data)
 	context['portfolio_performance_data'] = json.dumps(portfolio_performance_data)
+	context['portfolio_performance_years_data'] = json.dumps(portfolio_performance_years_data)
+	context['years'] = json.dumps(years)
 
 	return render(request, 'portfolio.html', context)

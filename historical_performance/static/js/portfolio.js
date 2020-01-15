@@ -251,7 +251,7 @@
                             calculate_quantity_total(index, false);
                         }
                         else{
-                            alert("There is no stock market quotation for the date '" + start_date + "'")
+                            alert("There is no stock market quotation for the " + stock + " stock in the date '" + start_date + "'")
                         }
                     });
             }
