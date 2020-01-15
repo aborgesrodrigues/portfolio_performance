@@ -155,7 +155,15 @@
                    <legend>Portfolio Performance</legend>
                    <canvas id="portfolio_performance_chart"></canvas>
                    <br/>
-
+                    Chart Type:
+                    <select id="unit_portfolio_performance" class="form-control stock_history">
+                        <option value="month" selected>Month</option>
+                        <option value="year">Year</option>
+                    </select>
+                    <select id="years_portfolio_performance" class="form-control stock_history">
+                        <option value="">All Years</option>
+                    </select>
+                    <button id="update_portfolio_performance" class="btn btn-sm btn-success">update</button>
                 </fieldset>
                 <fieldset>
                     <legend>Stock Price History</legend>
@@ -167,6 +175,9 @@
                         <option value="day" selected>Day</option>
                         <option value="month">Month</option>
                         <option value="year">Year</option>
+                    </select>
+                    <select id="years_stock_history" class="form-control stock_history">
+                        <option value="">All Years</option>
                     </select>
                     <button id="update_stock_history" class="btn btn-sm btn-success">update</button>
                 </fieldset>

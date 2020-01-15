@@ -12,35 +12,88 @@
         function()
         {
             var $years_stock_history = $("#years_stock_history");
+            var $years_portfolio_performance = $("#years_portfolio_performance");
 
+            //create the options for the years drowdown
             $.each(years, function (key, value) {
                 $years_stock_history.append($('<option></option>').attr('value', value).text(value));
+                $years_portfolio_performance.append($('<option></option>').attr('value', value).text(value));
             });
 
-            document.getElementById('update_stock_history').addEventListener('click', function() {
-                var unit = document.getElementById('unit_stock_history').value;
+            //Event for the update button of the stock history chart
+            $("#update_stock_history").click(function(){
+                var unit = $("#unit_stock_history").val();
+                var year = $("#years_stock_history").val();
 
                 data = stock_price_history_day_data;
 
-                if(unit == "month") {
-                    console.log("unit " + unit)
+                if(unit == "month")
                     data = stock_price_history_month_data;
-                }
                 else if (unit == "year")
                     data = stock_price_history_year_data;
 
-                chart_stock_price.config.data.datasets = get_stock_price_history_chart_dataset(data);
+                chart_stock_price.config.data.datasets = get_stock_price_history_chart_dataset(data, year);
                 chart_stock_price.update();
             });
 
+            //Event for the change of the stock history unity chart
+            $("#unit_stock_history").change(function() {
+                $years_stock_history.show();
+
+                if(this.value == "year") {
+                    $years_stock_history.hide();
+                    $years_stock_history.val("")
+                }
+            });
+
+            //Event for the update button of the portfolio performance chart
+            $("#update_portfolio_performance").click(function(){
+                var unit = $("#unit_portfolio_performance").val();
+                var year = $("#years_portfolio_performance").val();
+
+                data = portfolio_performance_data;
+
+                if (unit == "year")
+                    data = portfolio_performance_years_data;
+
+                var datasets_label = get_portfolio_performance_datasets(data, year);
+                console.log(datasets_label[0])
+
+                chart_portfolio_performance.config.data.labels = datasets_label[0];
+                chart_portfolio_performance.config.data.datasets = datasets_label[1];
+                chart_portfolio_performance.update();
+            });
+
+            //Event for the change of the portfolio performance unity chart
+            $("#unit_portfolio_performance").change(function() {
+                $years_portfolio_performance.show();
+
+                if(this.value == "year") {
+                    $years_portfolio_performance.hide();
+                    $years_portfolio_performance.val("")
+                }
+            });
 
             //Create charts
-            create_portfolio_performance_chart();
+            var chart_portfolio_performance = create_portfolio_performance_chart();
             var chart_stock_price = create_stock_price_history_chart();
         }
     );
 
-function get_stock_price_history_chart_dataset(data){
+//filter the data by year
+function filter_data_by_year(data, year){
+    var filtered_data = data;
+
+    if(year != "") {
+        filtered_data = filtered_data.filter(function (elem){
+            return elem.x.indexOf(year + "-") >= 0
+        });
+    }
+
+    return filtered_data;
+}
+
+function get_stock_price_history_chart_dataset(data, year){
     var datasets = [];
 
     for(var key in data){
@@ -50,7 +103,7 @@ function get_stock_price_history_chart_dataset(data){
                 label: key,
                 backgroundColor: color,//.alpha(0.5).rgbString(),
                 borderColor: color,
-                data: data[key],
+                data: filter_data_by_year(data[key], year),
                 type: "line",
                 pointRadius: 0,
                 fill: false,
@@ -74,7 +127,7 @@ function create_stock_price_history_chart(){
     var color = Chart.helpers.color;
     var cfg = {
         data: {
-            datasets: get_stock_price_history_chart_dataset(stock_price_history_day_data)
+            datasets: get_stock_price_history_chart_dataset(stock_price_history_day_data, "")
         },
         options: {
             animation: {
@@ -129,24 +182,25 @@ function create_stock_price_history_chart(){
     return chart;
 }
 
-
-function create_portfolio_performance_chart(){
+function get_portfolio_performance_datasets(data, year){
     var datasets = [];
 
-    for(var key in portfolio_performance_data){
+    for(var key in data){
 
-        if (portfolio_performance_data.hasOwnProperty(key)) {
+        if (data.hasOwnProperty(key)) {
+            var filtered_data = filter_data_by_year(data[key], year);
+
             //Creating the labels for the chart
             var labels = []
-            for(var item in portfolio_performance_data[key]){
-                labels.push(portfolio_performance_data[key][item].x);
+            for(var item in filtered_data[key]){
+                labels.push(filtered_data[key][item].x);
             }
 
             var color = getRandomColor();
             dataset = {
 				label: key,
 				backgroundColor: color,
-				data: portfolio_performance_data[key]
+				data: filtered_data
             }
 
 
@@ -154,15 +208,23 @@ function create_portfolio_performance_chart(){
         }
     }
 
+    return [labels, datasets];
+}
+
+
+function create_portfolio_performance_chart(){
+
     var ctx = document.getElementById('portfolio_performance_chart').getContext('2d');
     ctx.canvas.width = 1000;
     ctx.canvas.height = 300;
 
+    var datasets_label = get_portfolio_performance_datasets(portfolio_performance_data, "");
+
     cfg = {
         type: 'bar',
         data: {
-            labels: labels,
-            datasets: datasets,
+            labels: datasets_label[0],
+            datasets: datasets_label[1],
         },
         options: {
             title: {
@@ -187,5 +249,5 @@ function create_portfolio_performance_chart(){
     };
 
     var chart = new Chart(ctx, cfg);
-
+    return chart;
 }
