@@ -4,5 +4,5 @@ django-autocomplete-light==3.5.0
 requests==2.22.0
 
 #the above are needed only for the heroku
-gunicorn
-django-heroku
+#gunicorn
+#django-heroku
