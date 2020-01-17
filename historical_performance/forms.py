@@ -9,6 +9,7 @@ from historical_performance.models import Portfolio, Allocation
 import requests
 import json
 
+from portfolio_performance import settings
 
 
 class PortfolioForm(forms.ModelForm):
@@ -28,7 +29,7 @@ class PortfolioForm(forms.ModelForm):
 
 		if self.instance.pk:
 			self.fields['username'].widget.attrs['disabled'] = True
-			self.fields["start_date"].initial = self.instance.start_date.strftime("%d/%m/%Y")
+			#self.fields["start_date"].initial = self.instance.start_date.strftime("%d/%m/%Y")
 
 	def clean_initial_balance(self):
 		self.cleaned_data["initial_balance"] = Decimal(self.cleaned_data["initial_balance"].replace(",",""))

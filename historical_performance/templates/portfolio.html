@@ -26,8 +26,7 @@
         <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
         <script type="text/javascript" src="/static/autocomplete_light/jquery.init.js"></script>
         <script type="text/javascript" src="/static/vendor/select2/dist/js/select2.full.js"></script>
-        <script type="text/javascript" src="/static/vendor/select2/dist/js/i18n/pt.js"></script>
-        <script type="text/javascript" src="/static/vendor/select2/dist/js/i18n/pt-BR.js"></script>
+        <script type="text/javascript" src="/static/vendor/select2/dist/js/i18n/en.js"></script>
         <script type="text/javascript" src="/static/autocomplete_light/autocomplete.init.js"></script>
         <script type="text/javascript" src="/static/autocomplete_light/forward.js"></script>
         <script type="text/javascript" src="/static/autocomplete_light/select2.js"></script>
@@ -56,133 +55,140 @@
         <div class="container">
             {% bootstrap_messages %}
 
-            <div class="jumbotron p-3 p-md-5 text-white rounded bg-dark">
-                <div class="col-md-12 px-0">
-                    <form action="" method="POST" novalidate>
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-12">
-                                {% bootstrap_field form.username %}
-                            </div>
-                            <div class="col-md-4">
-                                {% bootstrap_field form.start_date %}
-                            </div>
-                            <div class="col-md-4">
-                                {% bootstrap_field form.initial_balance %}
-                            </div>
-                            <div class="col-md-4">
-                                {% bootstrap_field form.residual %}
-                            </div>
-                        </div>
-
-                        <fieldset>
+            <div class="row">
+                <div class="col-md-6 portfolio pad">
+                    <div class="col-md-12 px-0">
+                        <form action="" method="POST" novalidate>
+                            {% csrf_token %}
                             <div class="row">
-                                <div class="col-md-6">
-                                    <h4>Portfolio</h4>
+                                <div class="col-md-12">
+                                    {% bootstrap_field form.username %}
                                 </div>
-                                <div class="col-md-6" style="text-align:right">
-                                    <a id="add_allocation" href="#" class="btn btn-sm btn-success">Add Allocation</a>
+                                <div class="col-md-4">
+                                    {% bootstrap_field form.start_date %}
+                                </div>
+                                <div class="col-md-4">
+                                    {% bootstrap_field form.initial_balance %}
+                                </div>
+                                <div class="col-md-4">
+                                    {% bootstrap_field form.residual %}
                                 </div>
                             </div>
-                            <div id="formset">
-                                {{ formset.management_form }}
-                                <div class="allocation_form empty-form">
-                                    <div class="row">
-                                        <div class="col-md-3 allocation">
-                                            {% for campo in formset.empty_form.hidden_fields %}
-                                                {{ campo }}
-                                            {% endfor %}
-                                            {% bootstrap_field formset.empty_form.stock %}
-                                        </div>
-                                        <div class="col-md-2 unit_value">
-                                            {% bootstrap_field formset.empty_form.unit_value %}
-                                        </div>
-                                        <div class="col-md-2 percentage">
-                                            {% bootstrap_field formset.empty_form.percentage %}
-                                        </div>
-                                        <div class="col-md-2 quantity">
-                                            {% bootstrap_field formset.empty_form.quantity %}
-                                        </div>
-                                        <div class="col-md-1 total">
-                                            {% bootstrap_field formset.empty_form.total %}
-                                        </div>
-                                        <div class="col-md-12">
-                                            <a class="inline-deletelink remove_allocation" href="#" id="portfolio-__prefix__-remove">Remove Stock</a>
-                                        </div>
+
+                            <fieldset>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h4>Portfolio</h4>
+                                    </div>
+                                    <div class="col-md-6" style="text-align:right">
+                                        <a id="add_allocation" href="#" class="btn btn-sm btn-success">Add Allocation</a>
                                     </div>
                                 </div>
-                                {% for allocation_form in formset %}
-                                    <div class="allocation_form">
+                                <div id="formset">
+                                    {{ formset.management_form }}
+                                    <div class="allocation_form empty-form">
                                         <div class="row">
                                             <div class="col-md-3 allocation">
-                                                {% for campo in allocation_form.hidden_fields %}
-                                                {{ campo }}
+                                                {% for campo in formset.empty_form.hidden_fields %}
+                                                    {{ campo }}
                                                 {% endfor %}
-                                                {% bootstrap_field allocation_form.stock %}
+                                                {% bootstrap_field formset.empty_form.stock %}
                                             </div>
                                             <div class="col-md-2 unit_value">
-                                                {% bootstrap_field allocation_form.unit_value %}
+                                                {% bootstrap_field formset.empty_form.unit_value %}
                                             </div>
                                             <div class="col-md-2 percentage">
-                                                {% bootstrap_field allocation_form.percentage %}
+                                                {% bootstrap_field formset.empty_form.percentage %}
                                             </div>
                                             <div class="col-md-2 quantity">
-                                                {% bootstrap_field allocation_form.quantity %}
+                                                {% bootstrap_field formset.empty_form.quantity %}
                                             </div>
-                                            <div class="col-md-2 total">
-                                                {% bootstrap_field allocation_form.total %}
+                                            <div class="col-md-1 total">
+                                                {% bootstrap_field formset.empty_form.total %}
                                             </div>
-                                            <div class="col-md-1 bottom">
-                                                {% if not forloop.first %}
-                                                    {% bootstrap_field allocation_form.DELETE %}
-                                                {% endif %}
+                                            <div class="col-md-1 center">
+                                                <a class="inline-deletelink remove_allocation" href="#" id="portfolio-__prefix__-remove">Remove Stock</a>
                                             </div>
-
                                         </div>
-                                        <hr>
                                     </div>
-                                {% endfor %}
-                            </div>
+                                    {% for allocation_form in formset %}
+                                        <div class="allocation_form">
+                                            <div class="row">
+                                                <div class="col-md-3 allocation">
+                                                    {% for campo in allocation_form.hidden_fields %}
+                                                    {{ campo }}
+                                                    {% endfor %}
+                                                    {% bootstrap_field allocation_form.stock %}
+                                                </div>
+                                                <div class="col-md-2 unit_value">
+                                                    {% bootstrap_field allocation_form.unit_value %}
+                                                </div>
+                                                <div class="col-md-2 percentage">
+                                                    {% bootstrap_field allocation_form.percentage %}
+                                                </div>
+                                                <div class="col-md-2 quantity">
+                                                    {% bootstrap_field allocation_form.quantity %}
+                                                </div>
+                                                <div class="col-md-2 total">
+                                                    {% bootstrap_field allocation_form.total %}
+                                                </div>
+                                                <div class="col-md-1 center">
+                                                    {% if not forloop.first %}
+                                                        {% bootstrap_field allocation_form.DELETE %}
+                                                    {% endif %}
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </fieldset>
+                            <button class="btn btn-primary" id="btn_save">Save</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-6 pad chart">
+                    <div class="row mb-2">
+                        <fieldset class="fieldset">
+                           <legend>Portfolio Performance</legend>
+                           <canvas id="portfolio_performance_chart"></canvas>
+                           <br/>
+                            Chart Type:
+                            <select id="unit_portfolio_performance" class="form-control stock_history">
+                                <option value="month" selected>Month</option>
+                                <option value="year">Year</option>
+                            </select>
+                            <select id="years_portfolio_performance" class="form-control stock_history">
+                                <option value="">All Years</option>
+                            </select>
+                            <button id="update_portfolio_performance" class="btn btn-sm btn-success">update</button>
                         </fieldset>
-                        <button class="btn btn-primary" id="btn_save">Save</button>
-                    </form>
+                        <hr/>
+                        <fieldset class="fieldset">
+                            <legend>Stock Price History</legend>
+                            <canvas id="stock_price_history_chart"></canvas>
+                            <br/>
+
+                            Chart Type:
+                            <select id="unit_stock_history" class="form-control stock_history">
+                                <option value="day" selected>Day</option>
+                                <option value="month">Month</option>
+                                <option value="year">Year</option>
+                            </select>
+                            <select id="years_stock_history" class="form-control stock_history">
+                                <option value="">All Years</option>
+                            </select>
+                            <button id="update_stock_history" class="btn btn-sm btn-success">update</button>
+                        </fieldset>
+                    </div>
                 </div>
             </div>
+
+
         </div>
 
         <main role="main" class="container">
-            <div class="row mb-2">
-                <fieldset>
-                   <legend>Portfolio Performance</legend>
-                   <canvas id="portfolio_performance_chart"></canvas>
-                   <br/>
-                    Chart Type:
-                    <select id="unit_portfolio_performance" class="form-control stock_history">
-                        <option value="month" selected>Month</option>
-                        <option value="year">Year</option>
-                    </select>
-                    <select id="years_portfolio_performance" class="form-control stock_history">
-                        <option value="">All Years</option>
-                    </select>
-                    <button id="update_portfolio_performance" class="btn btn-sm btn-success">update</button>
-                </fieldset>
-                <fieldset>
-                    <legend>Stock Price History</legend>
-                    <canvas id="stock_price_history_chart"></canvas>
-                    <br/>
 
-                    Chart Type:
-                    <select id="unit_stock_history" class="form-control stock_history">
-                        <option value="day" selected>Day</option>
-                        <option value="month">Month</option>
-                        <option value="year">Year</option>
-                    </select>
-                    <select id="years_stock_history" class="form-control stock_history">
-                        <option value="">All Years</option>
-                    </select>
-                    <button id="update_stock_history" class="btn btn-sm btn-success">update</button>
-                </fieldset>
-            </div>
         </main><!-- /.container -->
 
         <footer class="blog-footer">

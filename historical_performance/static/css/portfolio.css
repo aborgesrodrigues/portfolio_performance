@@ -32,6 +32,33 @@ input[readonly]{
     display: inline;
 }
 
+
+.center{
+    margin: auto;
+    width: 50%;
+    padding: 0px;
+    text-align: left;
+}
+
+.container{
+    max-width: unset;
+}
+
+.pad{
+    padding: 20px;
+}
+
+.portfolio{
+    color: #ffffff;
+    border-radius: .25rem;
+    background-color: #343a40;
+}
+
+.chart hr{
+    border: 1px solid #000000;
+}
+
+/*
 body, .form-control{
     font-size: 12px;
     line-height: unset;
@@ -46,12 +73,6 @@ body, .form-control{
     padding: 0px;
 }
 
-.bottom{
-    margin: auto;
-    width: 50%;
-    padding: 10px;
-}
-
 .p-md-5{
     padding: 20px !important;
 }
@@ -62,4 +83,4 @@ body, .form-control{
 
 .allocation_form .form-group{
     margin-bottom: 0px;
-}
+}*/
