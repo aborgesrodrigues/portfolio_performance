@@ -9,7 +9,7 @@
         $.ajax({
                 type: "GET",
                 url: url,
-                async: false,
+                async: true,
             }).done(function(data) {
                 retorno(data);
             });
