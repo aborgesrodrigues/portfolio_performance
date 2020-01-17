@@ -31,3 +31,35 @@ input[readonly]{
     width: 100px;
     display: inline;
 }
+
+body, .form-control{
+    font-size: 12px;
+    line-height: unset;
+}
+
+.form-control{
+    padding: 5px;
+    height: 30px;
+}
+
+.select2-selection--single, .select2-container--default{
+    padding: 0px;
+}
+
+.bottom{
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+}
+
+.p-md-5{
+    padding: 20px !important;
+}
+
+.allocation_form{
+    line-height: 0px;
+}
+
+.allocation_form .form-group{
+    margin-bottom: 0px;
+}

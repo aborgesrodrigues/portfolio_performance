@@ -49,7 +49,7 @@ class PortfolioForm(forms.ModelForm):
 class AllocationForm(forms.ModelForm):
 	unit_value = forms.DecimalField(label="Unit Value", widget=forms.TextInput(attrs={"style": "width:100px", "mask":"#,##0.00", "placeholder": ""}))
 	stock = autocomplete.Select2ListChoiceField(
-		widget=autocomplete.ListSelect2(url='stock-autocomplete', attrs={'data-minimum-input-length': 3, 'class': 'form-control', "style": "width: 100px"}))
+		widget=autocomplete.ListSelect2(url='stock-autocomplete', attrs={'data-minimum-input-length': 3, 'class': 'form-control'}))
 	total = forms.CharField(required=False, label="Total", widget=forms.TextInput(
 		attrs={"style": "width:100px", "mask": "#,##0.00", "placeholder": ""}))
 	percentage = forms.IntegerField(label="Percentage", widget=forms.TextInput(
