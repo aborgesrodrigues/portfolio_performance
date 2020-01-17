@@ -57,7 +57,6 @@
                     data = portfolio_performance_years_data;
 
                 var datasets_label = get_portfolio_performance_datasets(data, year);
-                console.log(datasets_label[0])
 
                 chart_portfolio_performance.config.data.labels = datasets_label[0];
                 chart_portfolio_performance.config.data.datasets = datasets_label[1];
@@ -192,8 +191,8 @@ function get_portfolio_performance_datasets(data, year){
 
             //Creating the labels for the chart
             var labels = []
-            for(var item in filtered_data[key]){
-                labels.push(filtered_data[key][item].x);
+            for(var item in filtered_data){
+                labels.push(filtered_data[item].x);
             }
 
             var color = getRandomColor();
