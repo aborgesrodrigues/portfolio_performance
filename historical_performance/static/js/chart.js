@@ -194,6 +194,7 @@ function get_portfolio_performance_datasets(data, year){
             for(var item in filtered_data){
                 labels.push(filtered_data[item].x);
             }
+            console.log(labels);
 
             var color = getRandomColor();
             dataset = {
