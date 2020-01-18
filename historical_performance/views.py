@@ -83,51 +83,45 @@ def portfolio_view(request, username= None):
 			return redirect('portfolio_view', username=initial_portfolio.username)
 
 	#generate the data for the stock price history chart
+	#data for the stock history chart
 	stock_price_history_day_data = {}
 	stock_price_history_month_data = {}
 	stock_price_history_year_data = {}
+	#data for the performance chart
 	portfolio_performance_data = {}
 	portfolio_performance_years_data = {}
-	month_data = {}
-	year_data = {}
 	years = []
 
 	if initial_portfolio:
 
 		for allocation in initial_portfolio.allocations.all():
-			#stock_price_history_day_data[allocation.stock] = [dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value)) for performance in allocation.performances.all()]
-
-			month_data[allocation.stock] = {}
-			year_data[allocation.stock] = {}
+			#instantiate array for each stock
 			stock_price_history_day_data[allocation.stock] = []
 			stock_price_history_month_data[allocation.stock] = []
 			stock_price_history_year_data[allocation.stock] = []
+
 			portfolio_performance_data[allocation.stock] = []
 			portfolio_performance_years_data[allocation.stock] = []
+
 			for performance in allocation.performances.all().order_by("date"):
 				stock_price_history_day_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value)))
 
-				#get the performance date from the last day of each month
-				month_data[allocation.stock][performance.date.strftime("%Y-%m")] = performance
-				# get the performance date from the last day of each year
-				year_data[allocation.stock][performance.date.strftime("%Y")] = performance
+				month = performance.date.strftime("%Y-%m")
+				year = performance.date.strftime("%Y")
+				if not any(d.get('x', '') == month for d in portfolio_performance_data[allocation.stock]):
+					portfolio_performance_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m"), y=str(performance.unit_value * performance.allocation.quantity)))
 
-		#create data for monthly performance
-		for stock in month_data:
-			for month in month_data[stock]:
-				performance = month_data[stock][month]
-				portfolio_performance_data[stock].append(dict(x=month, y=str(performance.unit_value * performance.allocation.quantity)))
-				stock_price_history_month_data[stock].append(dict(x=month, y=str(performance.unit_value)))
+				if not any(d.get('x', '') == month for d in stock_price_history_month_data[allocation.stock]):
+					stock_price_history_month_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m"), y=str(performance.unit_value)))
 
-		#create data for year performance
-		for stock in year_data:
-			for year in year_data[stock]:
+				if not any(d.get('x', '') == year for d in portfolio_performance_years_data[allocation.stock]):
+					portfolio_performance_years_data[allocation.stock].append(dict(x=year, y=str(performance.unit_value * performance.allocation.quantity)))
+
+				if not any(d.get('x', '') == year for d in stock_price_history_year_data[allocation.stock]):
+					stock_price_history_year_data[allocation.stock].append(dict(x=year, y=str(performance.unit_value * performance.allocation.quantity)))
+
 				if not year in years:
 					years.append((year))
-				performance = year_data[stock][year]
-				portfolio_performance_years_data[stock].append(dict(x=year, y=str(performance.unit_value * performance.allocation.quantity)))
-				stock_price_history_year_data[stock].append(dict(x=year, y=str(performance.unit_value)))
-
 
 	context = {}
 	context['form'] = form
