@@ -247,7 +247,6 @@ function create_portfolio_performance_chart(){
             responsive: true,
             scales: {
                 xAxes: [{
-                    type: 'time',
                     stacked: true,
                 }],
                 yAxes: [{
