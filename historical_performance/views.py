@@ -110,12 +110,13 @@ def portfolio_view(request, username= None):
 				stock_price_history_day_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value)))
 
 				month = performance.date.strftime("%Y-%m")
+				month_portfolio = performance.date.strftime("%m/%Y")
 				year = performance.date.strftime("%Y")
 
 				#keep values only the last day of month
-				if any(month in d.get('x', '') for d in portfolio_performance_data[allocation.stock]):
+				if any(month_portfolio in d.get('x', '') for d in portfolio_performance_data[allocation.stock]):
 					portfolio_performance_data[allocation.stock].pop()
-				portfolio_performance_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value * performance.allocation.quantity)))
+				portfolio_performance_data[allocation.stock].append(dict(x=performance.date.strftime("%d/%m/%Y"), y=str(performance.unit_value * performance.allocation.quantity)))
 
 				if any(month in d.get('x', '') for d in stock_price_history_month_data[allocation.stock]):
 					stock_price_history_month_data[allocation.stock].pop()
@@ -124,7 +125,7 @@ def portfolio_view(request, username= None):
 				# keep values only the last day of year
 				if any(year in d.get('x', '') for d in portfolio_performance_years_data[allocation.stock]):
 					portfolio_performance_years_data[allocation.stock].pop()
-				portfolio_performance_years_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value * performance.allocation.quantity)))
+				portfolio_performance_years_data[allocation.stock].append(dict(x=performance.date.strftime("%d/%m/%Y"), y=str(performance.unit_value * performance.allocation.quantity)))
 
 				if any(year in d.get('x', '') for d in stock_price_history_year_data[allocation.stock]):
 					stock_price_history_year_data[allocation.stock].pop()
