@@ -9,8 +9,6 @@ from historical_performance.models import Portfolio, Allocation
 import requests
 import json
 
-from portfolio_performance import settings
-
 
 class PortfolioForm(forms.ModelForm):
 	start_date = forms.DateField(label='Start Date', help_text='dd/mm/yyyy',
