@@ -53,7 +53,9 @@
 
                 data = portfolio_performance_data;
 
-                if (unit == "year")
+                if(unit == "month")
+                    data = portfolio_performance_month_data;
+                else if (unit == "year")
                     data = portfolio_performance_years_data;
 
                 var datasets_label = get_portfolio_performance_datasets(data, year);
@@ -85,7 +87,7 @@ function filter_data_by_year(data, year){
 
     if(year != "") {
         filtered_data = filtered_data.filter(function (elem){
-            return elem.x.indexOf(year + "-") >= 0
+            return elem.x1.indexOf(year + "-") >= 0
         });
     }
 

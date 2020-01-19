@@ -89,6 +89,7 @@ def portfolio_view(request, username= None):
 	stock_price_history_year_data = {}
 	#data for the performance chart
 	portfolio_performance_data = {}
+	portfolio_performance_month_data = {}
 	portfolio_performance_years_data = {}
 	years = []
 	#variables to calculate percentage of portfolio
@@ -104,32 +105,45 @@ def portfolio_view(request, username= None):
 			stock_price_history_year_data[allocation.stock] = []
 
 			portfolio_performance_data[allocation.stock] = []
+			portfolio_performance_month_data[allocation.stock] = []
 			portfolio_performance_years_data[allocation.stock] = []
 
 			for performance in allocation.performances.all().order_by("date"):
-				stock_price_history_day_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value)))
+				stock_price_history_day_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"),
+																		   y=str(performance.unit_value),
+																		   x1=performance.date.strftime("%Y-%m-%d")))
+				portfolio_performance_data[allocation.stock].append(dict(x=performance.date.strftime("%d/%m/%Y"),
+																		 y=str(performance.unit_value * performance.allocation.quantity),
+																		 x1=performance.date.strftime("%Y-%m-%d")))
 
 				month = performance.date.strftime("%Y-%m")
-				month_portfolio = performance.date.strftime("%m/%Y")
 				year = performance.date.strftime("%Y")
 
 				#keep values only the last day of month
-				if any(month_portfolio in d.get('x', '') for d in portfolio_performance_data[allocation.stock]):
-					portfolio_performance_data[allocation.stock].pop()
-				portfolio_performance_data[allocation.stock].append(dict(x=performance.date.strftime("%d/%m/%Y"), y=str(performance.unit_value * performance.allocation.quantity)))
+				if any(month in d.get('x1', '') for d in portfolio_performance_month_data[allocation.stock]):
+					portfolio_performance_month_data[allocation.stock].pop()
+				portfolio_performance_month_data[allocation.stock].append(dict(x=performance.date.strftime("%d/%m/%Y"),
+																		 y=str(performance.unit_value * performance.allocation.quantity),
+																		 x1=performance.date.strftime("%Y-%m-%d")))
 
 				if any(month in d.get('x', '') for d in stock_price_history_month_data[allocation.stock]):
 					stock_price_history_month_data[allocation.stock].pop()
-				stock_price_history_month_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value)))
+				stock_price_history_month_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"),
+																			 y=str(performance.unit_value),
+																			 x1=performance.date.strftime("%Y-%m-%d")))
 
 				# keep values only the last day of year
 				if any(year in d.get('x', '') for d in portfolio_performance_years_data[allocation.stock]):
 					portfolio_performance_years_data[allocation.stock].pop()
-				portfolio_performance_years_data[allocation.stock].append(dict(x=performance.date.strftime("%d/%m/%Y"), y=str(performance.unit_value * performance.allocation.quantity)))
+				portfolio_performance_years_data[allocation.stock].append(dict(x=performance.date.strftime("%d/%m/%Y"),
+																			   y=str(performance.unit_value * performance.allocation.quantity),
+																			   x1=performance.date.strftime("%Y-%m-%d")))
 
 				if any(year in d.get('x', '') for d in stock_price_history_year_data[allocation.stock]):
 					stock_price_history_year_data[allocation.stock].pop()
-				stock_price_history_year_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"), y=str(performance.unit_value)))
+				stock_price_history_year_data[allocation.stock].append(dict(x=performance.date.strftime("%Y-%m-%d"),
+																			y=str(performance.unit_value),
+																			x1=performance.date.strftime("%Y-%m-%d")))
 
 				if not year in years:
 					years.append((year))
@@ -140,7 +154,9 @@ def portfolio_view(request, username= None):
 	context['stock_price_history_day_data'] = json.dumps(stock_price_history_day_data)
 	context['stock_price_history_month_data'] = json.dumps(stock_price_history_month_data)
 	context['stock_price_history_year_data'] = json.dumps(stock_price_history_year_data)
+
 	context['portfolio_performance_data'] = json.dumps(portfolio_performance_data)
+	context['portfolio_performance_month_data'] = json.dumps(portfolio_performance_month_data)
 	context['portfolio_performance_years_data'] = json.dumps(portfolio_performance_years_data)
 	context['years'] = json.dumps(years)
 

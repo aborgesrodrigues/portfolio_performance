@@ -155,7 +155,8 @@
                            <br/>
                             Chart Type:
                             <select id="unit_portfolio_performance" class="form-control stock_history">
-                                <option value="month" selected>Month</option>
+                                <option value="day" selected>Day</option>
+                                <option value="month">Month</option>
                                 <option value="year">Year</option>
                             </select>
                             <select id="years_portfolio_performance" class="form-control stock_history">
@@ -203,6 +204,7 @@
         {% endif %}
         {% if portfolio_performance_data %}
             var portfolio_performance_data = JSON.parse("{{ portfolio_performance_data | escapejs }}");
+            var portfolio_performance_month_data = JSON.parse("{{ portfolio_performance_month_data | escapejs }}");
             var portfolio_performance_years_data = JSON.parse("{{ portfolio_performance_years_data | escapejs }}");
         {% endif %}
     </script>
