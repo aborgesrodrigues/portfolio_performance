@@ -13,7 +13,7 @@ from portfolio_performance import settings
 
 
 class PortfolioForm(forms.ModelForm):
-	start_date = forms.DateField(label='Start Date', help_text='dd/mm/aaaa',
+	start_date = forms.DateField(label='Start Date', help_text='dd/mm/yyyy',
 	                                      widget=widgets.AdminDateWidget(
 		                                      attrs={'mask': '99/99/9999', 'pattern': '[0-9]{2}/[0-9]{2}/[0-9]{4}',
 		                                             'style': 'width:120px'}))

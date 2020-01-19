@@ -3,6 +3,7 @@ import unicodedata
 from django.db import models
 
 # Create your models here.
+from django.db.models import Sum, F
 from django.utils.encoding import force_text
 
 class Portfolio(models.Model):
@@ -48,6 +49,19 @@ class PerformancePortfolio(models.Model):
 	date = models.DateField(verbose_name="Date")
 	allocation = models.ForeignKey(Allocation, verbose_name="Portfolio", related_name='performances', on_delete=models.CASCADE)
 	unit_value = models.DecimalField(verbose_name="Value", max_digits=8, decimal_places=2)
+	quantity = models.PositiveIntegerField(verbose_name="Quantity")
+	percentage = models.PositiveIntegerField(verbose_name="Percentage")
+
+	@staticmethod
+	def calculate_percentage(portfolio):
+		performances = PerformancePortfolio.objects.filter(allocation__portfolio= portfolio)\
+			.values('date')\
+			.annotate(new_balance=Sum(F('unit_value') * F('quantity'),
+									  output_field=models.FloatField()))
+		for performance in performances:
+			PerformancePortfolio.objects.filter(allocation__portfolio= portfolio, date= performance.get("date"))\
+				.annotate(total= F('unit_value') * F('quantity'))\
+				.update(percentage= 100 * F('total')/performance.get("new_balance", 1))
 
 	def __str__(self):
 		return '{} - Date: {}'.format(self.allocation.stock, self.date.strftime("%d/%m/%Y"))

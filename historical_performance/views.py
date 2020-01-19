@@ -74,9 +74,13 @@ def portfolio_view(request, username= None):
 								performance_portfolio = PerformancePortfolio()
 								performance_portfolio.allocation = allocation
 								performance_portfolio.unit_value = Decimal(history[key].get("close", None))
+								performance_portfolio.quantity = allocation.quantity
+								performance_portfolio.percentage = 0
 								performance_portfolio.date = datetime.datetime.strptime(key, "%Y-%m-%d")
 
 								performance_portfolio.save()
+
+				PerformancePortfolio.calculate_percentage(initial_portfolio)
 
 
 			messages.success(request, 'Performance portfolio successfully added .')
@@ -114,7 +118,10 @@ def portfolio_view(request, username= None):
 																		   x1=performance.date.strftime("%Y-%m-%d")))
 				portfolio_performance_data[allocation.stock].append(dict(x=performance.date.strftime("%d/%m/%Y"),
 																		 y=str(performance.unit_value * performance.allocation.quantity),
-																		 x1=performance.date.strftime("%Y-%m-%d")))
+																		 x1=performance.date.strftime("%Y-%m-%d"),
+																		 percentage= round(performance.percentage, 0),
+																		 unit_value= str(performance.unit_value),
+																		 quantity= performance.quantity))
 
 				month = performance.date.strftime("%Y-%m")
 				year = performance.date.strftime("%Y")
@@ -123,8 +130,11 @@ def portfolio_view(request, username= None):
 				if any(month in d.get('x1', '') for d in portfolio_performance_month_data[allocation.stock]):
 					portfolio_performance_month_data[allocation.stock].pop()
 				portfolio_performance_month_data[allocation.stock].append(dict(x=performance.date.strftime("%d/%m/%Y"),
-																		 y=str(performance.unit_value * performance.allocation.quantity),
-																		 x1=performance.date.strftime("%Y-%m-%d")))
+																			   y=str(performance.unit_value * performance.allocation.quantity),
+																			   x1=performance.date.strftime("%Y-%m-%d"),
+																			   percentage= round(performance.percentage, 0),
+																			   unit_value=str(performance.unit_value),
+																			   quantity=performance.quantity))
 
 				if any(month in d.get('x', '') for d in stock_price_history_month_data[allocation.stock]):
 					stock_price_history_month_data[allocation.stock].pop()
@@ -137,7 +147,10 @@ def portfolio_view(request, username= None):
 					portfolio_performance_years_data[allocation.stock].pop()
 				portfolio_performance_years_data[allocation.stock].append(dict(x=performance.date.strftime("%d/%m/%Y"),
 																			   y=str(performance.unit_value * performance.allocation.quantity),
-																			   x1=performance.date.strftime("%Y-%m-%d")))
+																			   x1=performance.date.strftime("%Y-%m-%d"),
+																			   percentage= round(performance.percentage, 0),
+																			   unit_value=str(performance.unit_value),
+																			   quantity=performance.quantity))
 
 				if any(year in d.get('x', '') for d in stock_price_history_year_data[allocation.stock]):
 					stock_price_history_year_data[allocation.stock].pop()

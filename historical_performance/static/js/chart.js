@@ -241,7 +241,8 @@ function create_portfolio_performance_chart(){
                         if (label) {
                             label += ': ';
                         }
-                        label += parseFloat(tooltipItem.value).toFixed(2);
+                        var item = myData.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                        label += parseFloat(tooltipItem.value).toFixed(2) + " (" + parseFloat(item.unit_value).toFixed(2) + " x " + item.quantity + ") - " + item.percentage + "%";
                         return label;
                     }
                 }
