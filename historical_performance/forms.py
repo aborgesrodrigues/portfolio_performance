@@ -10,6 +10,31 @@ import requests
 import json
 
 
+class BaseFormSet(forms.models.BaseInlineFormSet):
+	def is_valid(self):
+		return super(BaseFormSet, self).is_valid() and \
+		       not any([bool(e) for e in self.errors])
+
+	def clean(self):
+		# get forms that actually have valid data
+		count = 0
+		percentage = 0
+		for form in self.forms:
+			try:
+				if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+					count += 1
+					percentage += form.cleaned_data.get('percentage', 0)
+			except AttributeError:
+				# annoyingly, if a subform is invalid Django explicity raises
+				# an AttributeError for cleaned_data
+				pass
+		#shoul be informed at least one stock
+		if count < 1:
+			raise forms.ValidationError('Inform at least one stock.')
+		if percentage > 100:
+			raise forms.ValidationError('The sum of the percentages should not be more than 100')
+
+
 class PortfolioForm(forms.ModelForm):
 	start_date = forms.DateField(label='Start Date', help_text='dd/mm/yyyy',
 	                                      widget=widgets.AdminDateWidget(
@@ -27,14 +52,15 @@ class PortfolioForm(forms.ModelForm):
 
 		if self.instance.pk:
 			self.fields['username'].widget.attrs['disabled'] = True
-			#self.fields["start_date"].initial = self.instance.start_date.strftime("%d/%m/%Y")
 
 	def clean_initial_balance(self):
+		# format the initial balance value to a valid decimal value
 		self.cleaned_data["initial_balance"] = Decimal(self.cleaned_data["initial_balance"].replace(",",""))
 
 		return self.cleaned_data["initial_balance"]
 
 	def clean_residual(self):
+		#format the residual value to a valid decimal value
 		self.cleaned_data["residual"] = Decimal(self.cleaned_data["residual"].replace(",",""))
 
 		return self.cleaned_data["residual"]
@@ -67,8 +93,7 @@ class AllocationForm(forms.ModelForm):
 		if self.instance.pk:
 			self.fields['stock'].choices = [(self.instance.stock, self.instance.stock)]
 
-
-	def clean(self):
+	def clean_stock(self):
 		stock = self.data["%s-stock" % (self.prefix)]
 
 		#Validate if the stock informed exist
@@ -77,13 +102,8 @@ class AllocationForm(forms.ModelForm):
 
 		if json_response.get("total_returned") == 0:
 			raise forms.ValidationError("Stock symbol is not valid!")
-		else:
-			self.fields['stock'].choices = [(stock, stock)]
-			self.cleaned_data["stock"] = stock
-			if self._errors.get("stock", None):
-				del self._errors["stock"]
 
-		return self.cleaned_data
+		return self.cleaned_data["stock"]
 
 	class Meta:
 		model = Allocation
@@ -91,5 +111,5 @@ class AllocationForm(forms.ModelForm):
 
 
 AllocationFormSet = inlineformset_factory(
-    Portfolio, Allocation, extra= 0, min_num=1, can_delete=True, form=AllocationForm
+    Portfolio, Allocation, formset=BaseFormSet, extra= 0, min_num=1, can_delete=True, form=AllocationForm
 )
