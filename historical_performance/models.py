@@ -4,7 +4,8 @@ from django.db import models
 
 # Create your models here.
 from django.db.models import Sum, F
-from django.utils.encoding import force_text
+from django.utils.text import slugify
+
 
 class Portfolio(models.Model):
 	"""
@@ -22,7 +23,7 @@ class Portfolio(models.Model):
 
 	def save(self, *args, **kwargs):
 		#normalize the username
-		self.username = unicodedata.normalize('NFKC', force_text(self.username))
+		self.username = slugify(self.username)
 
 		super(Portfolio, self).save(*args, **kwargs)
 
