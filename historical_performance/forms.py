@@ -6,9 +6,10 @@ from django.contrib.admin import widgets
 from django import forms
 
 from historical_performance.models import Portfolio, Allocation
-from django.utils.translation import ugettext_lazy as _
 import requests
 import json
+
+from historical_performance.util import get_api_url
 
 
 class BaseFormSet(forms.models.BaseInlineFormSet):
@@ -29,11 +30,12 @@ class BaseFormSet(forms.models.BaseInlineFormSet):
 				# annoyingly, if a subform is invalid Django explicity raises
 				# an AttributeError for cleaned_data
 				pass
-		#shoul be informed at least one stock
+		#should be informed at least one stock
 		if count < 1:
 			raise forms.ValidationError('Inform at least one stock.')
+		#the total percenta should not be bigger than 100
 		if percentage > 100:
-			raise forms.ValidationError('The sum of the percentages should not be more than 100')
+			raise forms.ValidationError('The sum of the percentages should not be more than 100.')
 
 
 class PortfolioForm(forms.ModelForm):
@@ -100,7 +102,7 @@ class AllocationForm(forms.ModelForm):
 			stock = self.data["%s-stock" % (self.prefix)]
 
 			#Validate if the stock informed exist
-			response = requests.get("https://api.worldtradingdata.com/api/v1/stock_search?search_term=%s&search_by=symbol&limit=50&page=1&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG" % stock)
+			response = requests.get(get_api_url("stock_search") + "&search_term=%s&search_by=symbol&limit=50&page=1" % stock)
 			json_response = json.loads(response.text)
 
 			#the method clean_stock is not callend when using the autocomplete libray
@@ -114,6 +116,17 @@ class AllocationForm(forms.ModelForm):
 					del self.errors["stock"]
 
 		return self.cleaned_data
+
+	def clean_total(self):
+		total = Decimal(self.cleaned_data["total"].replace(",",""))
+		unit_value = self.cleaned_data["unit_value"]
+		quantity = self.cleaned_data["quantity"]
+		correct_total = unit_value * quantity
+
+		if total != correct_total:
+			raise forms.ValidationError("The total should be %s, %s found." % (correct_total, total))
+
+		return total
 
 	def clean_percentage(self):
 		percentage = self.cleaned_data["percentage"]

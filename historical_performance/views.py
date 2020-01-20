@@ -13,17 +13,16 @@ from historical_performance.models import Portfolio, PerformancePortfolio
 from dal import autocomplete
 import requests
 import json
+from historical_performance.util import get_api_url
 
-def get_api_url(command):
-	return "https://api.worldtradingdata.com/api/v1/%s?api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG" % command
 
 class StockAutocomplete(autocomplete.Select2ListView):
 	def get_list(self):
 		response = requests.get(get_api_url("stock_search") + "&search_term=%s&search_by=symbol&limit=50&page=1" % self.q)
 		if response.ok:
-		    json_response = json.loads(response.text)
+			json_response = json.loads(response.text)
 
-		    return [stock.get("symbol") for stock in json_response.get("data")]
+			return [stock.get("symbol") for stock in json_response.get("data")]
 		else:
 			return []
 
