@@ -6,6 +6,7 @@ from django.contrib.admin import widgets
 from django import forms
 
 from historical_performance.models import Portfolio, Allocation
+from django.utils.translation import ugettext_lazy as _
 import requests
 import json
 
@@ -75,11 +76,11 @@ class AllocationForm(forms.ModelForm):
 	unit_value = forms.DecimalField(label="Unit Value", widget=forms.TextInput(attrs={"style": "width:100px", "mask":"#,##0.00", "placeholder": ""}))
 	stock = autocomplete.Select2ListChoiceField(
 		widget=autocomplete.ListSelect2(url='stock-autocomplete', attrs={'data-minimum-input-length': 3, 'class': 'form-control'}))
-	total = forms.CharField(required=False, label="Total", widget=forms.TextInput(
+	total = forms.CharField(label="Total", widget=forms.TextInput(
 		attrs={"style": "width:100px", "mask": "#,##0.00", "placeholder": ""}))
 	percentage = forms.IntegerField(label="Percentage", widget=forms.TextInput(
 		attrs={"style": "width:100px", "mask": "999", "placeholder": ""}))
-	quantity = forms.IntegerField(required=False, label="Quantity", widget=forms.TextInput(
+	quantity = forms.IntegerField(label="Quantity", widget=forms.TextInput(
 		attrs={"style": "width:100px", "mask": "#,##0.00", "placeholder": ""}))
 
 
@@ -93,17 +94,34 @@ class AllocationForm(forms.ModelForm):
 		if self.instance.pk:
 			self.fields['stock'].choices = [(self.instance.stock, self.instance.stock)]
 
-	def clean_stock(self):
-		stock = self.data["%s-stock" % (self.prefix)]
+	def clean(self):
+		#when using the autocomplete library the stock value is not in the self.cleaned_data variable
+		if self.data.get("%s-stock" % (self.prefix), None):
+			stock = self.data["%s-stock" % (self.prefix)]
 
-		#Validate if the stock informed exist
-		response = requests.get("https://api.worldtradingdata.com/api/v1/stock_search?search_term=%s&search_by=symbol&limit=50&page=1&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG" % stock)
-		json_response = json.loads(response.text)
+			#Validate if the stock informed exist
+			response = requests.get("https://api.worldtradingdata.com/api/v1/stock_search?search_term=%s&search_by=symbol&limit=50&page=1&api_token=avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG" % stock)
+			json_response = json.loads(response.text)
 
-		if json_response.get("total_returned") == 0:
-			raise forms.ValidationError("Stock symbol is not valid!")
+			#the method clean_stock is not callend when using the autocomplete libray
+			if json_response.get("total_returned") == 0:
+				self.errors["stock"][0] = "Stock symbol is not valid."
+				raise forms.ValidationError("Stock symbol is not valid.")
+			else:
+				self.fields['stock'].choices = [(stock, stock)]
+				self.cleaned_data["stock"] = stock
+				if self.errors.get("stock", None):
+					del self.errors["stock"]
 
-		return self.cleaned_data["stock"]
+		return self.cleaned_data
+
+	def clean_percentage(self):
+		percentage = self.cleaned_data["percentage"]
+
+		if percentage > 100:
+			raise forms.ValidationError("The percentage should be between 0 and 100.")
+
+		return percentage
 
 	class Meta:
 		model = Allocation
