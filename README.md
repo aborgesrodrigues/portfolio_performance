@@ -20,3 +20,10 @@ $ python manage.py runserver
 ```
 
 Then visit `http://localhost:8000` to view the app. 
+
+##Screenshots
+<img src="portfolio.png" style="width: 70%;"/>
+
+<img src="portfolio_performance_chart.png" style="width: 70%;"/>
+
+<img src="stock_history_chart.png" style="width: 70%;"/>
