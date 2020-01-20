@@ -3,7 +3,7 @@ import datetime
 
 # Create your tests here.
 from historical_performance.forms import PortfolioForm, AllocationForm, AllocationFormSet
-from historical_performance.models import Portfolio
+from historical_performance.models import Portfolio, Allocation, PerformancePortfolio
 
 
 class PortfolioFormTests(TestCase):
@@ -178,3 +178,92 @@ class AllocationFormSetTests(TestCase):
 		self.assertFalse(formset.is_valid())
 
 		self.assertEqual(formset.non_form_errors(), ["The sum of the percentages should not be more than 100."])
+
+
+class PortfolioTest(TestCase):
+
+	#username is slugify
+	def test_username(self):
+		portfolio = Portfolio()
+		portfolio.username = "Alessandro Borges"
+		portfolio.start_date = datetime.datetime.strptime("2016-01-01", "%Y-%m-%d")
+		portfolio.initial_balance = 10000
+		portfolio.residual = 0
+		portfolio.save()
+
+		self.assertEqual(portfolio.username, "alessandro-borges")
+
+	def test_percentage(self):
+		#add portfolio
+		portfolio = Portfolio()
+		portfolio.username = "Alessandro Borges"
+		portfolio.start_date = datetime.datetime.strptime("2016-01-01", "%Y-%m-%d")
+		portfolio.initial_balance = 4782.8
+		portfolio.residual = 0
+		portfolio.save()
+
+		#add allocation
+		allocation = Allocation()
+		allocation.portfolio = portfolio
+		allocation.stock = "ASNA"
+		allocation.unit_value = 217.4
+		allocation.quantity = 22
+		allocation.percentage = 50
+		allocation.save()
+
+		#add performance
+		performance_portfolio = PerformancePortfolio()
+		performance_portfolio.allocation = allocation
+		performance_portfolio.unit_value = 215.4
+		performance_portfolio.quantity = allocation.quantity
+		performance_portfolio.percentage = 0
+		performance_portfolio.date = datetime.datetime.strptime("2016-01-06", "%Y-%m-%d")
+		performance_portfolio.save()
+
+		# add allocation
+		allocation = Allocation()
+		allocation.portfolio = portfolio
+		allocation.stock = "CGOOF"
+		allocation.unit_value = 1.15
+		allocation.quantity = 2608
+		allocation.percentage = 30
+		allocation.save()
+
+		# add performance
+		performance_portfolio = PerformancePortfolio()
+		performance_portfolio.allocation = allocation
+		performance_portfolio.unit_value = 1.23
+		performance_portfolio.quantity = allocation.quantity
+		performance_portfolio.percentage = 0
+		performance_portfolio.date = datetime.datetime.strptime("2016-01-06", "%Y-%m-%d")
+		performance_portfolio.save()
+
+		# add allocation
+		allocation = Allocation()
+		allocation.portfolio = portfolio
+		allocation.stock = "APPF"
+		allocation.unit_value = 13.95
+		allocation.quantity = 143
+		allocation.percentage = 20
+		allocation.save()
+
+		# add performance
+		performance_portfolio = PerformancePortfolio()
+		performance_portfolio.allocation = allocation
+		performance_portfolio.unit_value = 13.94
+		performance_portfolio.quantity = allocation.quantity
+		performance_portfolio.percentage = 0
+		performance_portfolio.date = datetime.datetime.strptime("2016-01-06", "%Y-%m-%d")
+		performance_portfolio.save()
+
+		#calculate percentages
+		PerformancePortfolio.calculate_percentage(portfolio)
+
+		performance_asna = PerformancePortfolio.objects.get(allocation__stock= "ASNA")
+		performance_cgoof = PerformancePortfolio.objects.get(allocation__stock="CGOOF")
+		performance_appf = PerformancePortfolio.objects.get(allocation__stock="APPF")
+
+		self.assertEqual([round(performance_asna.percentage),
+		                  round(performance_cgoof.percentage),
+		                  round(performance_appf.percentage)], [48, 32, 20])
+
