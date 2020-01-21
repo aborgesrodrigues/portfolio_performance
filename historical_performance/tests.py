@@ -36,12 +36,11 @@ class PortfolioFormTests(TestCase):
 
 class AllocationTests(TestCase):
 	def setUp(self):
-		self.portfolio = Portfolio()
-		self.portfolio.username = "aborges"
-		self.portfolio.start_date = datetime.datetime.strptime("2016-01-01", "%Y-%m-%d")
-		self.portfolio.initial_balance = 10000
-		self.portfolio.residual = 0
-		self.portfolio.save()
+		self.portfolio = Portfolio.objects.create(
+			username= "aborges",
+			start_date = datetime.datetime.strptime("2016-01-01", "%Y-%m-%d"),
+			initial_balance = 10000,
+			residual = 0)
 
 		self.empty_data = {"allocations-0-portfolio": "",
 		        "allocations-0-stock": "",
@@ -130,12 +129,11 @@ class AllocationTests(TestCase):
 class AllocationFormSetTests(TestCase):
 
 	def setUp(self):
-		self.portfolio = Portfolio()
-		self.portfolio.username = "aborges"
-		self.portfolio.start_date = datetime.datetime.strptime("2016-01-01", "%Y-%m-%d")
-		self.portfolio.initial_balance = 10000
-		self.portfolio.residual = 0
-		self.portfolio.save()
+		self.portfolio = Portfolio.objects.create(
+			username = "aborges",
+			start_date = datetime.datetime.strptime("2016-01-01", "%Y-%m-%d"),
+			initial_balance = 10000,
+			residual = 0)
 
 		self.empty_data = {
 			'allocations-TOTAL_FORMS': 0,
@@ -184,77 +182,75 @@ class PortfolioTest(TestCase):
 
 	#username is slugify
 	def test_username(self):
-		portfolio = Portfolio()
-		portfolio.username = "Alessandro Borges"
-		portfolio.start_date = datetime.datetime.strptime("2016-01-01", "%Y-%m-%d")
-		portfolio.initial_balance = 10000
-		portfolio.residual = 0
-		portfolio.save()
+		portfolio = Portfolio.objects.create(
+			username = "Alessandro Borges",
+			start_date = datetime.datetime.strptime("2016-01-01", "%Y-%m-%d"),
+			initial_balance = 10000,
+			residual = 0)
 
 		self.assertEqual(portfolio.username, "alessandro-borges")
 
 	def test_percentage(self):
 		#add portfolio
-		portfolio = Portfolio()
-		portfolio.username = "Alessandro Borges"
-		portfolio.start_date = datetime.datetime.strptime("2016-01-01", "%Y-%m-%d")
-		portfolio.initial_balance = 4782.8
-		portfolio.residual = 0
-		portfolio.save()
+		portfolio = Portfolio.objects.create(
+			username = "Alessandro Borges",
+			start_date = datetime.datetime.strptime("2016-01-01", "%Y-%m-%d"),
+			initial_balance = 4782.8,
+			residual = 0)
 
 		#add allocation
-		allocation = Allocation()
-		allocation.portfolio = portfolio
-		allocation.stock = "ASNA"
-		allocation.unit_value = 217.4
-		allocation.quantity = 22
-		allocation.percentage = 50
-		allocation.save()
+		allocation = Allocation.objects.create(
+			portfolio=portfolio,
+			stock="ASNA",
+			unit_value=217.4,
+			quantity=22,
+			percentage=50
+		)
 
 		#add performance
-		performance_portfolio = PerformancePortfolio()
-		performance_portfolio.allocation = allocation
-		performance_portfolio.unit_value = 215.4
-		performance_portfolio.quantity = allocation.quantity
-		performance_portfolio.percentage = 0
-		performance_portfolio.date = datetime.datetime.strptime("2016-01-06", "%Y-%m-%d")
-		performance_portfolio.save()
+		PerformancePortfolio.objects.create(
+			allocation=allocation,
+			unit_value=215.4,
+			quantity=allocation.quantity,
+			percentage=0,
+			date=datetime.datetime.strptime("2016-01-06", "%Y-%m-%d")
+		)
 
 		# add allocation
-		allocation = Allocation()
-		allocation.portfolio = portfolio
-		allocation.stock = "CGOOF"
-		allocation.unit_value = 1.15
-		allocation.quantity = 2608
-		allocation.percentage = 30
-		allocation.save()
+		allocation = Allocation.objects.create(
+			portfolio=portfolio,
+			stock="CGOOF",
+			unit_value= 1.15,
+			quantity=2608,
+			percentage=30
+		)
 
 		# add performance
-		performance_portfolio = PerformancePortfolio()
-		performance_portfolio.allocation = allocation
-		performance_portfolio.unit_value = 1.23
-		performance_portfolio.quantity = allocation.quantity
-		performance_portfolio.percentage = 0
-		performance_portfolio.date = datetime.datetime.strptime("2016-01-06", "%Y-%m-%d")
-		performance_portfolio.save()
+		PerformancePortfolio.objects.create(
+			allocation=allocation,
+			unit_value=1.23,
+			quantity=allocation.quantity,
+			percentage=0,
+			date=datetime.datetime.strptime("2016-01-06", "%Y-%m-%d")
+		)
 
 		# add allocation
-		allocation = Allocation()
-		allocation.portfolio = portfolio
-		allocation.stock = "APPF"
-		allocation.unit_value = 13.95
-		allocation.quantity = 143
-		allocation.percentage = 20
-		allocation.save()
+		allocation = Allocation.objects.create(
+			portfolio=portfolio,
+			stock="APPF",
+			unit_value= 13.95,
+			quantity=143,
+			percentage=20
+		)
 
 		# add performance
-		performance_portfolio = PerformancePortfolio()
-		performance_portfolio.allocation = allocation
-		performance_portfolio.unit_value = 13.94
-		performance_portfolio.quantity = allocation.quantity
-		performance_portfolio.percentage = 0
-		performance_portfolio.date = datetime.datetime.strptime("2016-01-06", "%Y-%m-%d")
-		performance_portfolio.save()
+		PerformancePortfolio.objects.create(
+			allocation=allocation,
+			unit_value=13.94,
+			quantity=allocation.quantity,
+			percentage=0,
+			date=datetime.datetime.strptime("2016-01-06", "%Y-%m-%d")
+		)
 
 		#calculate percentages
 		PerformancePortfolio.calculate_percentage(portfolio)
