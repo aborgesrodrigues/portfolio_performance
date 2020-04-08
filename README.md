@@ -2,6 +2,8 @@ Portfolio Performance
 =================
 
 This application shows the evolution of a portfolio stock during the time. The values of the quotations are get from this [free api](https://www.worldtradingdata.com/). The charts are builded using the [chartjs library](https://www.chartjs.org).
+
+It is possible to see this project deployed in the[Heroku server](https://performance-portfolio.herokuapp.com/aborgesrodrigues).
    
 ## Building
 
