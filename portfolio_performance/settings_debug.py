@@ -130,4 +130,4 @@ DATETIME_FORMAT = "d/m/Y H:i:s"
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-CHARTJS_TOKEN = "avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG"
+CHARTJS_TOKEN = "3032a33259165e09f0ad7bbdba84659c"

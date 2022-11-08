@@ -135,4 +135,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
-CHARTJS_TOKEN = "avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG"
+CHARTJS_TOKEN = "3032a33259165e09f0ad7bbdba84659c"
