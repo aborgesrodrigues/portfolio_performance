@@ -102,7 +102,7 @@ class AllocationForm(forms.ModelForm):
 			stock = self.data["%s-stock" % (self.prefix)]
 
 			#Validate if the stock informed exist
-			response = requests.get(get_api_url("stock_search") + "&search_term=%s&search_by=symbol&limit=50&page=1" % stock)
+			response = requests.get(get_api_url(stock, "/eod/latest"))
 			json_response = json.loads(response.text)
 
 			#the method clean_stock is not callend when using the autocomplete libray

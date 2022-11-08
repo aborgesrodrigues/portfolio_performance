@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+import os
 
 from django.db import transaction
 from django.db.models import Max, Case, When, DateField
@@ -14,11 +15,12 @@ from dal import autocomplete
 import requests
 import json
 from historical_performance.util import get_api_url
+from portfolio_performance.settings import BASE_DIR, STATIC_ROOT
 
 
 class StockAutocomplete(autocomplete.Select2ListView):
 	def get_list(self):
-		response = requests.get(get_api_url("stock_search") + "&search_term=%s&search_by=symbol&limit=50&page=1" % self.q)
+		response = requests.get(get_api_url(self.q, "/eod/latest"))
 		if response.ok:
 			json_response = json.loads(response.text)
 
@@ -28,11 +30,14 @@ class StockAutocomplete(autocomplete.Select2ListView):
 
 
 def get_quotation(request, stock, date):
-	response = requests.get(get_api_url("history_multi_single_day") + "&symbol=%s&date=%s" % (stock, date))
+	response = requests.get(get_api_url(stock, f"/intraday/{date}") + "&offset=1")
 	if response.ok:
 		return JsonResponse(json.loads(response.text))
 
 	return JsonResponse({})
+
+def teste_view(request):
+	return JsonResponse({"BASE_DIR": BASE_DIR, "STATIC_ROOT": STATIC_ROOT})
 
 def portfolio_view(request, username= None):
 	# If the username is passed get the data from de database

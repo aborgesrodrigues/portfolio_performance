@@ -135,32 +135,12 @@ function create_stock_price_history_chart(){
                 duration: 0
             },
             scales: {
-                xAxes: [{
-                    type: 'time',
-                    distribution: 'series',
-                    offset: true,
-                    ticks: {
-                        major: {
-                            enabled: true,
-                            fontStyle: 'bold'
-                        },
-                        source: 'data',
-                        autoSkip: true,
-                        autoSkipPadding: 75,
-                        maxRotation: 0,
-                        sampleSize: 100
-                    }
-
-                }],
-                yAxes: [{
-                    gridLines: {
-                        drawBorder: false
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Closing price ($)'
-                    }
-                }]
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    stacked: true
+                }
             },
             tooltips: {
                 intersect: false,
@@ -249,12 +229,12 @@ function create_portfolio_performance_chart(){
             },
             responsive: true,
             scales: {
-                xAxes: [{
+                x: {
                     stacked: true,
-                }],
-                yAxes: [{
+                },
+                y: {
                     stacked: true
-                }]
+                }
             }
         }
     };

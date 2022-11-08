@@ -243,11 +243,10 @@
                 formated_start_date = formated_start_date[2] + "-" + formated_start_date[1] + "-" + formated_start_date[0]
 
                 //get the quotation of the stock on the start date
-
                 callAjax("/" + stock + "/" + formated_start_date,
                     function(result){
-                        if(result["date"]){
-                            $("#id_allocations-" + index + "-unit_value").val(result.data[stock].close);
+                        if(result["data"]){
+                            $("#id_allocations-" + index + "-unit_value").val(result.data[0].close);
                             calculate_quantity_total(index, false);
                         }
                         else{
