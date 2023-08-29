@@ -65,22 +65,21 @@ def portfolio_view(request, username= None):
 
 					#Get historical for the stock
 					#https: // api.worldtradingdata.com / api / v1 / history?symbol = SNAP & sort = newest & api_token = avDHLQfjNZUmiNJD6T0LOMq6MsAx7D61XiLYEDw2beXSbtFdwjKOd2QzLTNG
-					response = requests.get(get_api_url("history") + "&symbol=%s&date_from=%s&sort=oldest" % (allocation.stock, allocation.portfolio.start_date.strftime("%Y-%m-%d")))
+					response = requests.get(get_api_url("", "/eod") + f"&symbols={allocation.stock}&date_from={allocation.portfolio.start_date.strftime('%Y-%m-%d')}&sort=desc")
 
 					if response.ok:
 						json_response = json.loads(response.text)
 
-						if json_response.get("name",None):
-							history = json_response.get("history", [])
-							for key in history:
-								performance_portfolio = PerformancePortfolio()
-								performance_portfolio.allocation = allocation
-								performance_portfolio.unit_value = Decimal(history[key].get("close", None))
-								performance_portfolio.quantity = allocation.quantity
-								performance_portfolio.percentage = 0
-								performance_portfolio.date = datetime.datetime.strptime(key, "%Y-%m-%d")
+						history = json_response.get("data", [])
+						for h in history:
+							performance_portfolio = PerformancePortfolio()
+							performance_portfolio.allocation = allocation
+							performance_portfolio.unit_value = Decimal(h.get("close", None))
+							performance_portfolio.quantity = allocation.quantity
+							performance_portfolio.percentage = 0
+							performance_portfolio.date = datetime.datetime.strptime(h.get("date").replace("T00:00:00+0000", ""), "%Y-%m-%d")
 
-								performance_portfolio.save()
+							performance_portfolio.save()
 
 				PerformancePortfolio.calculate_percentage(initial_portfolio)
 
