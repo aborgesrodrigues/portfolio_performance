@@ -14,13 +14,13 @@ from historical_performance.models import Portfolio, PerformancePortfolio
 from dal import autocomplete
 import requests
 import json
-from historical_performance.util import get_api_url
+from historical_performance.util import get_api_url, get_search_api_url
 from portfolio_performance.settings import BASE_DIR, STATIC_ROOT
 
 
 class StockAutocomplete(autocomplete.Select2ListView):
 	def get_list(self):
-		response = requests.get(get_api_url(self.q, "/eod/latest"))
+		response = requests.get(get_search_api_url(self.q))
 		if response.ok:
 			json_response = json.loads(response.text)
 

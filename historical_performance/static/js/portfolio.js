@@ -246,7 +246,7 @@
                 callAjax("/" + stock + "/" + formated_start_date,
                     function(result){
                         if(result["data"]){
-                            $("#id_allocations-" + index + "-unit_value").val(result.data[0].close);
+                            $("#id_allocations-" + index + "-unit_value").val(result.data[0].close.toFixed(2));
                             calculate_quantity_total(index, false);
                         }
                         else{

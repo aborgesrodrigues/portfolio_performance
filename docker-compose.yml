@@ -4,12 +4,7 @@ services: # the different images that will be running as containers
     build:
       context: .
       dockerfile: local.Dockerfile
-    # command: sh -c "python manage.py collectstatic --clear --noinput"
     ports:
       - "8000:8000"
     volumes: 
-      - static_volume:/root/work/static
       - .:/root/work
-
-volumes:
-  static_volume:
